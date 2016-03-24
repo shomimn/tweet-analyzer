@@ -1,9 +1,13 @@
 var heatmap;
+var heatmapArray = [];
 var heatRadius = 10;
+var currentLayer = 0;
+var map;
+var hardcoreData = '[[{"latitude":40.7934322,"longitude":-73.4151214},{"latitude":40.86083333,"longitude":-73.55722222},{"latitude":40.87364276,"longitude":-73.9081192},{"latitude":40.7142,"longitude":-74.0064},{"latitude":40.7518058,"longitude":-74.0050704},{"latitude":40.764099,"longitude":-73.978413},{"latitude":40.7222519,"longitude":-74.000061},{"latitude":40.7232,"longitude":-73.99421},{"latitude":40.7142,"longitude":-74.0064},{"latitude":40.73038927,"longitude":-73.99842386},{"latitude":41.0029834,"longitude":-73.6832728},{"latitude":40.7143528,"longitude":-74.0059731},{"latitude":40.7458,"longitude":-73.9527283},{"latitude":40.7476807,"longitude":-73.9873581},{"latitude":40.8644204,"longitude":-73.9289876},{"latitude":40.7142,"longitude":-74.0064},{"latitude":41.3033,"longitude":-73.9993},{"latitude":40.665081,"longitude":-73.698402},{"latitude":40.74751706,"longitude":-73.59097481}],[{"latitude":40.77628877,"longitude":-73.94997993},{"latitude":40.71669795,"longitude":-74.00001602},{"latitude":40.71669795,"longitude":-74.00001602},{"latitude":40.7764882,"longitude":-73.4673454},{"latitude":40.77274259,"longitude":-73.972216},{"latitude":40.71647145,"longitude":-73.96289479},{"latitude":40.7547438,"longitude":-73.9358372},{"latitude":40.7834345,"longitude":-73.9662495},{"latitude":40.72107081,"longitude":-73.9877979},{"latitude":40.74673056,"longitude":-73.82477913},{"latitude":40.7830603,"longitude":-73.9712488},{"latitude":40.72712949,"longitude":-74.00693676},{"latitude":40.71770251,"longitude":-73.95839015},{"latitude":40.75721,"longitude":-73.98347},{"latitude":40.7127837,"longitude":-74.0059413},{"latitude":40.74062,"longitude":-74.00734},{"latitude":39.5314776,"longitude":-74.9384135},{"latitude":40.74852494,"longitude":-73.98571014},{"latitude":40.9094153,"longitude":-73.8986879},{"latitude":40.74967896,"longitude":-74.00342856},{"latitude":40.7207559,"longitude":-74.0007613},{"latitude":40.7598305,"longitude":-73.9866867},{"latitude":40.7127837,"longitude":-74.0059413}],[{"latitude":40.71297996,"longitude":-74.01318669},{"latitude":40.76381934,"longitude":-73.97279875},{"latitude":40.70415322,"longitude":-73.99499067},{"latitude":40.86083333,"longitude":-73.55722222},{"latitude":40.7579793,"longitude":-73.9997455},{"latitude":40.6548713,"longitude":-74.0064354},{"latitude":40.7787724,"longitude":-73.4213251},{"latitude":40.75674994,"longitude":-73.99191141},{"latitude":40.7602619,"longitude":-73.9932872},{"latitude":40.71448982,"longitude":-73.99800735},{"latitude":40.7143528,"longitude":-74.0059731},{"latitude":40.86876571,"longitude":-73.8938139},{"latitude":40.7293282,"longitude":-73.9984283},{"latitude":40.76149614,"longitude":-73.98143901},{"latitude":42.6875071,"longitude":-73.8153935},{"latitude":40.5907707,"longitude":-73.9602585},{"latitude":40.76857343,"longitude":-73.98151508}],[{"latitude":40.7579793,"longitude":-73.9997455},{"latitude":40.7314568,"longitude":-73.4455168},{"latitude":40.7142,"longitude":-74.0064},{"latitude":40.74898908,"longitude":-73.9935124},{"latitude":40.75648987,"longitude":-73.98626804},{"latitude":40.86083333,"longitude":-73.55722222},{"latitude":40.75904647,"longitude":-73.98498088},{"latitude":40.8270448,"longitude":-73.975694},{"latitude":40.7142,"longitude":-74.0064},{"latitude":40.8937111,"longitude":-73.9752731},{"latitude":40.63972222,"longitude":-73.77888889},{"latitude":40.65,"longitude":-73.95},{"latitude":42.616,"longitude":-77.4026}],[{"latitude":40.76056652,"longitude":-73.98471643},{"latitude":40.7579793,"longitude":-73.9997455},{"latitude":40.72191787,"longitude":-73.95754527},{"latitude":40.725058,"longitude":-73.999037},{"latitude":40.70890545,"longitude":-74.0081244},{"latitude":40.7519846,"longitude":-73.9697795},{"latitude":40.7142,"longitude":-74.0064},{"latitude":40.75943,"longitude":-73.98558},{"latitude":40.7207559,"longitude":-74.0007613},{"latitude":40.7620309,"longitude":-73.978561},{"latitude":40.94817265,"longitude":-73.89642139},{"latitude":40.78130904,"longitude":-73.91208848},{"latitude":40.8118515,"longitude":-73.9521332},{"latitude":40.8256536,"longitude":-73.2026138},{"latitude":40.713522,"longitude":-73.605016},{"latitude":41.00073,"longitude":-73.81502},{"latitude":40.6914,"longitude":-73.8061},{"latitude":40.7143528,"longitude":-74.0059731},{"latitude":40.989087,"longitude":-73.80800441},{"latitude":40.73902068,"longitude":-73.98964686},{"latitude":40.70595327,"longitude":-73.99656773}]]';
 
 window.onload = function () 
 {
-    var socket = new WebSocket("ws://192.168.58.1:8888");
+    var socket = new WebSocket("ws://localhost:8888");
             
     socket.onopen = function(event)
     {
@@ -11,7 +15,7 @@ window.onload = function ()
     };
     socket.onmessage = function(msg)
     {
-        addPointsOnMap(msg.data);
+//        addPointsOnMap(msg.data);
     }
     console.log("ovde radi");
 }
@@ -19,19 +23,16 @@ window.onload = function ()
 function initMap()
 {
     var mapDiv = document.getElementById("map");
-    var map = new google.maps.Map(mapDiv, { center: {lat: 40.748817, lng: -73.985428}, zoom: 11});
+    map = new google.maps.Map(mapDiv, { center: {lat: 40.748817, lng: -73.985428}, zoom: 11});
     
-    heatmap = new google.maps.visualization.HeatmapLayer({
-          data: getPoints(),
-          map: map
-        });
+    addPointsOnMap(hardcoreData);
 
 }
 
-
 function toggleHeatmap() 
 {
-        heatmap.setMap(heatmap.getMap() ? null : map);
+//        heatmap.setMap(heatmap.getMap() ? null : map);
+    heatmapArray[currentLayer].setMap(heatmapArray[currentLayer].getMap() ? null : map);
 }
 
  function changeGradient() {
@@ -51,7 +52,8 @@ function toggleHeatmap()
           'rgba(191, 0, 31, 1)',
           'rgba(255, 0, 0, 1)'
         ]
-        heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
+//        heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
+        heatmapArray[currentLayer].set('gradient', heatmapArray[currentLayer].get('gradient') ? null : gradient);
       }
 
 function changeRadius() 
@@ -59,12 +61,14 @@ function changeRadius()
     heatRadius += 5;
     if(heatRadius == 40)
         heatRadius = 10;
-    heatmap.set('radius', heatRadius);
+//    heatmap.set('radius', heatRadius);
+    heatmapArray[currentLayer].set('radius', heatRadius);
 }
 
 function changeOpacity() 
 {
-    heatmap.set('opacity', heatmap.get('opacity') ? null : 0.2);
+//    heatmap.set('opacity', heatmap.get('opacity') ? null : 0.2);
+    heatmapArray[currentLayer].set('opacity', heatmapArray[currentLayer].get('opacity') ? null : 0.2);
 }
 
 function getPoints() 
@@ -74,19 +78,63 @@ function getPoints()
             new google.maps.LatLng(40.59524418, -73.9551571)
         ];
 }
-
 function addPointsOnMap(msg)
 {
-    var data = JSON.parse(msg);
+    var dataArray = JSON.parse(msg);
+//    var heatmapArray = [];
 
-    var latLngArray = [];
-    for(var i=0; i<data.length; ++i)
+    for(var i=0; i<dataArray.length; ++i)
     {
-        var latlng = [];
-        var lat = data[i].latitude;
-        var lon = data[i].longitude;
+        var latLngArray = [];
         
-        latLngArray.push(new google.maps.LatLng(lat, lon));
+        var data = dataArray[i];
+        for(var j=0; j<data.length; ++j)
+        {
+            var lat = data[j].latitude;
+            var lon = data[j].longitude;
+            
+            latLngArray.push(new google.maps.LatLng(lat, lon));
+        }
+        
+        var hmap = new google.maps.visualization.HeatmapLayer({
+          data: latLngArray,
+          map: null
+        });
+        
+        heatmapArray.push(hmap);
     }
-    return latLngArray;
+    heatmapArray[currentLayer].setMap(map);
 }
+
+function showLayer()
+{
+    var layeriD = $("#layer-id").val();
+    heatmapArray[currentLayer].setMap(null);
+    currentLayer = layeriD;
+    heatmapArray[currentLayer].setMap(map);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

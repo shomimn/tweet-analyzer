@@ -1,9 +1,12 @@
 var heatmap;
+var heatmapArray = [];
 var heatRadius = 10;
+var currentLayer = 0;
+var map;
 
 window.onload = function () 
 {
-    var socket = new WebSocket("ws://192.168.58.1:8888");
+    var socket = new WebSocket("ws://localhost:8888");
             
     socket.onopen = function(event)
     {
@@ -11,10 +14,7 @@ window.onload = function ()
     };
     socket.onmessage = function(msg)
     {
-        heatmap = new google.maps.visualization.HeatmapLayer({
-          data: addPointsOnMap(msg.data),
-          map: map
-        });
+        addPointsOnMap(msg.data);
     }
     console.log("ovde radi");
 }
@@ -22,16 +22,14 @@ window.onload = function ()
 function initMap()
 {
     var mapDiv = document.getElementById("map");
-    var map = new google.maps.Map(mapDiv, { center: {lat: 40.748817, lng: -73.985428}, zoom: 11});
-    
-
+    map = new google.maps.Map(mapDiv, { center: {lat: 40.748817, lng: -73.985428}, zoom: 11});
 
 }
 
-
 function toggleHeatmap() 
 {
-        heatmap.setMap(heatmap.getMap() ? null : map);
+//        heatmap.setMap(heatmap.getMap() ? null : map);
+    heatmapArray[currentLayer].setMap(heatmapArray[currentLayer].getMap() ? null : map);
 }
 
  function changeGradient() {
@@ -51,7 +49,8 @@ function toggleHeatmap()
           'rgba(191, 0, 31, 1)',
           'rgba(255, 0, 0, 1)'
         ]
-        heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
+//        heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
+        heatmapArray[currentLayer].set('gradient', heatmapArray[currentLayer].get('gradient') ? null : gradient);
       }
 
 function changeRadius() 
@@ -59,12 +58,14 @@ function changeRadius()
     heatRadius += 5;
     if(heatRadius == 40)
         heatRadius = 10;
-    heatmap.set('radius', heatRadius);
+//    heatmap.set('radius', heatRadius);
+    heatmapArray[currentLayer].set('radius', heatRadius);
 }
 
 function changeOpacity() 
 {
-    heatmap.set('opacity', heatmap.get('opacity') ? null : 0.2);
+//    heatmap.set('opacity', heatmap.get('opacity') ? null : 0.2);
+    heatmapArray[currentLayer].set('opacity', heatmapArray[currentLayer].get('opacity') ? null : 0.2);
 }
 
 function getPoints() 
@@ -74,19 +75,63 @@ function getPoints()
             new google.maps.LatLng(40.59524418, -73.9551571)
         ];
 }
-
 function addPointsOnMap(msg)
 {
-    var data = JSON.parse(msg);
+    var dataArray = JSON.parse(msg);
+//    var heatmapArray = [];
 
-    var latLngArray = [];
-    for(var i=0; i<data.length; ++i)
+    for(var i=0; i<dataArray.length; ++i)
     {
-        var latlng = [];
-        var lat = data[i].latitude;
-        var lon = data[i].longitude;
+        var latLngArray = [];
         
-        latLngArray.push(new google.maps.LatLng(lat, lon));
+        var data = dataArray[i];
+        for(var j=0; j<data.length; ++j)
+        {
+            var lat = data[j].latitude;
+            var lon = data[j].longitude;
+            
+            latLngArray.push(new google.maps.LatLng(lat, lon));
+        }
+        
+        var hmap = new google.maps.visualization.HeatmapLayer({
+          data: latLngArray,
+          map: null
+        });
+        
+        heatmapArray.push(hmap);
     }
-    return latLngArray;
+    heatmapArray[currentLayer].setMap(map);
 }
+
+function showLayer()
+{
+    var layeriD = $("#layer-id").val();
+    heatmapArray[currentLayer].setMap(null);
+    currentLayer = layeriD;
+    heatmapArray[currentLayer].setMap(map);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
