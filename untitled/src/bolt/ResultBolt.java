@@ -32,16 +32,27 @@ public class ResultBolt extends BaseBasicBolt
             longitude = lng;
             date = d;
         }
+
+        public SpatialData(double lat, double lng)
+        {
+            latitude = lat;
+            longitude = lng;
+        }
     }
 
     private WebServer server;
     private int delay;
-    private ArrayList<SpatialData> list;
+    private int timeUnits;
+    private ArrayList<ArrayList<SpatialData>> list;
 
-    public ResultBolt(int d)
+    public ResultBolt(int d, int units)
     {
         delay = d;
+        timeUnits = units;
         list = new ArrayList<>();
+
+        for (int i = 0; i < timeUnits; ++i)
+            list.add(new ArrayList<>());
     }
 
     @Override
@@ -64,9 +75,12 @@ public class ResultBolt extends BaseBasicBolt
             @Override
             public void run()
             {
+                System.out.println(list.size());
+
                 Gson gson = new Gson();
-                Type type = new TypeToken<ArrayList<ResultBolt.SpatialData>>(){}.getType();
+                Type type = new TypeToken<ArrayList<ArrayList<SpatialData>>>(){}.getType();
                 String json = gson.toJson(list, type);
+
                 System.out.println(json);
 
                 server.sendToAll(json);
@@ -86,12 +100,11 @@ public class ResultBolt extends BaseBasicBolt
     @Override
     public void execute(Tuple tuple, BasicOutputCollector basicOutputCollector)
     {
-        Status status = (Status) tuple.getValue(0);
+        int timeUnit = tuple.getInteger(0);
+        double latitude = tuple.getDouble(1);
+        double longitude = tuple.getDouble(2);
 
-        list.add(new SpatialData(
-                status.getGeoLocation().getLatitude(),
-                status.getGeoLocation().getLongitude(),
-                status.getCreatedAt()));
+        insert(list.get(timeUnit), latitude, longitude);
     }
 
     @Override
@@ -105,5 +118,10 @@ public class ResultBolt extends BaseBasicBolt
     {
 
         super.cleanup();
+    }
+
+    private void insert(ArrayList<SpatialData> innerList, double lat, double lng)
+    {
+        innerList.add(new SpatialData(lat, lng));
     }
 }
