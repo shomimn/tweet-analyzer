@@ -22,6 +22,19 @@
 
         <div id="map"></div>
         
-        <input type="number" id="layer-id"><button onclick="showLayer()">Submit</button>       
+<!--
+        <div id="timestamps">
+            <button class="btn btn-default" onclick="showPrevious()">previous</button>
+            <input class="form-control" type="number" id="layer-id" value="0"  onkeypress="handle(event)">
+            <button class="btn btn-default" onclick="showNext()">next</button>  
+        </div>
+-->
+        <div class="input-group" id="timestamps">
+            <span class="input-group-addon" id="basic-addon1" onclick="showPrevious()"><img src="left.png" id="left-and-right"></span>
+            <input id="layer-id" type="text" class="form-control" placeholder="timestamp" aria-describedby="basic-addon1" value="0" onkeypress="handle(event)">
+            <span class="input-group-addon" id="basic-addon1" onclick="showNext()"><img src="right.png" id="left-and-right"></span>
+            <span class="input-group-addon" id="basic-addon1" onclick="playAnimation()"><img src="play.png" id="left-and-right" class="timestamp-animation"></span>
+        </div>
+        
     </body>
 </html>
