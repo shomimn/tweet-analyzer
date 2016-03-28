@@ -123,7 +123,8 @@ function toggleHeatmap()
     heatmapArray[currentLayer].setMap(heatmapArray[currentLayer].getMap() ? null : map);
 }
 
- function changeGradient() {
+ function changeGradient() 
+{
         var gradient = [
           'rgba(0, 255, 255, 0)',
           'rgba(0, 255, 255, 1)',
@@ -166,6 +167,7 @@ function getPoints()
             new google.maps.LatLng(40.59524418, -73.9551571)
         ];
 }
+
 function addPointsOnMap(dataArray)
 {
     for(var i=0; i<dataArray.length; ++i)
@@ -203,6 +205,7 @@ function showLayer()
     currentLayer = layeriD;
     heatmapArray[currentLayer].setMap(map);
 }
+
 function showPrevious()
 {
     if(currentLayer == 0)
@@ -213,6 +216,7 @@ function showPrevious()
     heatmapArray[currentLayer].setMap(map);
     $("#layer-id").val(currentLayer);
 }
+
 function showNext()
 {
     if(currentLayer == heatmapArray.length-1)
@@ -227,11 +231,13 @@ function showNext()
     heatmapArray[currentLayer].setMap(map);
     $("#layer-id").val(currentLayer);
 }
+
 function handle(e)
 {
     if(e.keyCode === 13)
         showLayer();
 }
+
 function playAnimation()
 {
     if(playingAnim)
