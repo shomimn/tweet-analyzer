@@ -1,27 +1,64 @@
-
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
-        <meta content="utf-8" http-equiv="encoding">
-        <link rel="stylesheet" type="text/css" href="index.css">
-        <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/6.1.5/css/bootstrap-slider.min.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/6.1.5/bootstrap-slider.min.js"></script>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-        <script src="https://maps.googleapis.com/maps/api/js?callback=initMap&libraries=visualization" async defer></script>
-        <script src="javascript.js"></script>
-    </head>
-    <body>
-        <div id="floating-panel">
-          <button class="btn btn-primary" onclick="toggleHeatmap()">Toggle Heatmap</button>
-          <button class="btn btn-primary" onclick="changeGradient()">Change gradient</button>
-          <button class="btn btn-primary" onclick="changeRadius()">Change radius</button>
-          <button class="btn btn-primary" onclick="changeOpacity()">Change opacity</button>
-        </div>
 
-        <div id="map"></div>
-        
-        <input type="number" id="layer-id"><button onclick="showLayer()">Submit</button>       
-    </body>
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <link rel="stylesheet" type="text/css" href="index.css">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/6.1.5/css/bootstrap-slider.min.css">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/6.1.5/bootstrap-slider.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?callback=initMap&libraries=visualization" async defer></script>
+    <script src="javascript.js"></script>
+</head>
+
+<body>
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <div id="floating-panel">
+                <button class="btn btn-primary" onclick="toggleHeatmap()">Toggle Heatmap</button>
+                <button class="btn btn-primary" onclick="changeGradient()">Change gradient</button>
+                <button class="btn btn-primary" onclick="changeRadius()">Change radius</button>
+                <button class="btn btn-primary" onclick="changeOpacity()">Change opacity</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div id="map" class="col-md-8 col-md-offset-2"></div>
+    </div>
+
+    <!--
+        <div id="timestamps">
+            <button class="btn btn-default" onclick="showPrevious()">previous</button>
+            <input class="form-control" type="number" id="layer-id" value="0"  onkeypress="handle(event)">
+            <button class="btn btn-default" onclick="showNext()">next</button>  
+        </div>
+-->
+    <div class="input-group" id="timestamps">
+        <span class="input-group-addon" id="basic-addon1" onclick="showPrevious()"><img src="left.png" id="left-and-right"></span>
+        <input id="layer-id" type="text" class="form-control" placeholder="timestamp" aria-describedby="basic-addon1" value="0" onkeypress="handle(event)">
+        <span class="input-group-addon" id="basic-addon1" onclick="showNext()"><img src="right.png" id="left-and-right"></span>
+        <span class="input-group-addon" id="basic-addon1" onclick="playAnimation()"><img src="play.png" id="left-and-right" class="timestamp-animation"></span>
+    </div>
+
+    </br>
+    <div class="row">
+        <div id="container" class="col-md-12">
+            <div id="pie-chart" class="col-md-6"></div>
+            <div id="inner" class="col-md-6">
+                <select class="form-control" id="timeSelect">
+                    <option value="days">Days</option>
+                    <option value="hours">Hours</option>
+                    <option value="minutes">Minutes</option>
+                </select>
+                <div id="bar-chart"></div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
 </html>

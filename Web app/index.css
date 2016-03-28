@@ -1,22 +1,58 @@
 #map
 {
-    width: 1200px;
+/*    width: 1200px;*/
     height: 600px;
     background-color: #ccc;
     
-    text-align: left;
-    margin-left: auto;
-    margin-right: auto;
+/*    text-align: left;*/
+/*    margin-left: auto;*/
+/*    margin-right: auto;*/
 }
 #floating-panel
 {
-    width: 1200px;
-    text-align: left;
-    margin-left: auto;
+/*    width: 1200px;*/
+/*    text-align: center;*/
+/*    margin-left: auto;*/
+/*    margin-right: auto;*/
     margin-top: 5px;
-    margin-bottom: 5px;
+    margin-bottom: 10px;
 }
 
 #ex1Slider .slider-selection {
 	background: #BABABA;
+}
+#timestamps
+{
+    width: 250px;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 10px;
+}
+#left-and-right
+{
+    height: 20px;
+}
+#layer-id
+{
+    text-align: center;
+}
+.input-group-addon
+{
+    cursor:pointer;
+}
+.timestamp-animation
+{
+    min-width: 34px;
+}
+
+
+#pie-chart {
+/*    width: 600px;*/
+    height: 600px;
+}
+
+#bar-chart {
+/*    width: 800px;*/
+    height: 600px;
 }

@@ -1,20 +1,19 @@
-import org.apache.storm.shade.org.joda.time.DateTime;
-
-import java.util.Date;
-
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.utils.Utils;
+import bolt.PlaceBolt;
 import bolt.PrinterBolt;
 import bolt.ResultBolt;
+import bolt.TimePointBolt;
 import bolt.TimeUnitBolt;
 import spout.TwitterSpout;
+import util.TimeFragmenter;
 
 public class Main
 {
-    public static final int DELAY = 300000;
-    public static final int TIMEUNITS = 5;
+    public static final int DURATION = 1800000;
+    public static final int TIME_UNITS = 5;
 
     public static void main(String[] args) throws Exception
     {
@@ -26,14 +25,27 @@ public class Main
         String accessTokenSecret = "iRgGshI44MsSmc8tqzmApqzBz0fPBCm8HL1rUVK1s7nn4";
         String[] keyWords = new String[] { };
 
-        builder.setSpout("twitter", new TwitterSpout(consumerKey, consumerSecret,
+        TimeFragmenter fragmenter = new TimeFragmenter(DURATION, TIME_UNITS);
+
+        builder.setSpout(TwitterSpout.ID, new TwitterSpout(consumerKey, consumerSecret,
                 accessToken, accessTokenSecret, keyWords));
-        builder.setBolt("print", new PrinterBolt())
-                .shuffleGrouping("twitter");
-        builder.setBolt("timeUnit", new TimeUnitBolt(TIMEUNITS, DELAY))
-                .shuffleGrouping("print");
-        builder.setBolt("result", new ResultBolt(DELAY, TIMEUNITS), 1)
-                .shuffleGrouping("timeUnit");
+
+        builder.setBolt(PrinterBolt.ID, new PrinterBolt())
+                .shuffleGrouping(TwitterSpout.ID);
+
+        builder.setBolt(TimeUnitBolt.ID, new TimeUnitBolt(fragmenter))
+                .shuffleGrouping(PrinterBolt.ID, PrinterBolt.TIME_UNIT_STREAM);
+
+        builder.setBolt(PlaceBolt.ID, new PlaceBolt())
+                .shuffleGrouping(PrinterBolt.ID, PrinterBolt.PLACE_STREAM);
+
+        builder.setBolt(TimePointBolt.ID, new TimePointBolt(fragmenter))
+                .shuffleGrouping(PrinterBolt.ID, PrinterBolt.TIME_POINT_STREAM);
+
+        builder.setBolt(ResultBolt.ID, new ResultBolt(DURATION, TIME_UNITS), 1)
+                .shuffleGrouping(TimeUnitBolt.ID, TimeUnitBolt.STREAM)
+                .shuffleGrouping(PlaceBolt.ID, PlaceBolt.STREAM)
+                .shuffleGrouping(TimePointBolt.ID, TimePointBolt.STREAM);
 
         Config config = new Config();
 //        config.setDebug(true);
@@ -42,7 +54,7 @@ public class Main
 
         cluster.submitTopology("test", config, builder.createTopology());
 
-        Utils.sleep(DELAY);
+        Utils.sleep(DURATION);
 
         cluster.shutdown();
     }

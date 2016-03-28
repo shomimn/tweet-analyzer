@@ -22,6 +22,8 @@ import twitter4j.conf.ConfigurationBuilder;
 
 public class TwitterSpout extends BaseRichSpout
 {
+    public static final String ID = "twitterSpout";
+
     SpoutOutputCollector collector;
     LinkedBlockingQueue<Status> queue = null;
     TwitterStream twitterStream = null;

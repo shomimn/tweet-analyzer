@@ -1,11 +1,16 @@
 package bolt;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
+
+import org.apache.storm.shade.org.joda.time.Days;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -16,10 +21,12 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Tuple;
 import server.WebServer;
-import twitter4j.Status;
+
 
 public class ResultBolt extends BaseBasicBolt
 {
+    public static final String ID = "resultBolt";
+
     public static class SpatialData
     {
         public double latitude;
@@ -41,18 +48,44 @@ public class ResultBolt extends BaseBasicBolt
     }
 
     private WebServer server;
-    private int delay;
+    private int duration;
     private int timeUnits;
-    private ArrayList<ArrayList<SpatialData>> list;
+
+    private ArrayList<ArrayList<SpatialData>> list = new ArrayList<>();
+    private HashMap<String, Integer> placesMap = new HashMap<>();
+    private HashMap<String, Integer> daysMap = new HashMap<>();
+    private HashMap<String, Integer> hoursMap = new HashMap<>();
+    private HashMap<String, Integer> minsMap = new HashMap<>();
+
+    private Type listType = new TypeToken<ArrayList<ArrayList<SpatialData>>>(){}.getType();
+    private Type mapType = new TypeToken<HashMap<String, Integer>>(){}.getType();
 
     public ResultBolt(int d, int units)
     {
-        delay = d;
+        duration = d;
         timeUnits = units;
-        list = new ArrayList<>();
 
         for (int i = 0; i < timeUnits; ++i)
             list.add(new ArrayList<>());
+
+        initMaps();
+    }
+
+    private void initMaps()
+    {
+        daysMap.put("Monday", 0);
+        daysMap.put("Tuesday", 0);
+        daysMap.put("Wednesday", 0);
+        daysMap.put("Thursday", 0);
+        daysMap.put("Friday", 0);
+        daysMap.put("Saturday", 0);
+        daysMap.put("Sunday", 0);
+
+        for (int i = 1; i < 25; ++i)
+            hoursMap.put(String.valueOf(i), 0);
+
+        for (int i = 0; i < 60; ++i)
+            minsMap.put(String.valueOf(i), 0);
     }
 
     @Override
@@ -75,12 +108,26 @@ public class ResultBolt extends BaseBasicBolt
             @Override
             public void run()
             {
-                System.out.println(list.size());
-
                 Gson gson = new Gson();
-                Type type = new TypeToken<ArrayList<ArrayList<SpatialData>>>(){}.getType();
-                String json = gson.toJson(list, type);
 
+                System.out.println(list.size());
+                JsonElement timeUnits = gson.toJsonTree(list, listType);
+                JsonElement places = gson.toJsonTree(placesMap, mapType);
+                JsonElement days = gson.toJsonTree(daysMap, mapType);
+                JsonElement hours = gson.toJsonTree(hoursMap, mapType);
+                JsonElement mins = gson.toJsonTree(minsMap, mapType);
+
+                JsonObject timePoints = new JsonObject();
+                timePoints.add("days", days);
+                timePoints.add("hours", hours);
+                timePoints.add("mins", mins);
+
+                JsonObject root = new JsonObject();
+                root.add("timeUnits", timeUnits);
+                root.add("places", places);
+                root.add("timePoints", timePoints);
+
+                String json = root.toString();
                 System.out.println(json);
 
                 server.sendToAll(json);
@@ -94,17 +141,38 @@ public class ResultBolt extends BaseBasicBolt
                     e.printStackTrace();
                 }
             }
-        }, delay);
+        }, duration);
     }
 
     @Override
     public void execute(Tuple tuple, BasicOutputCollector basicOutputCollector)
     {
-        int timeUnit = tuple.getInteger(0);
-        double latitude = tuple.getDouble(1);
-        double longitude = tuple.getDouble(2);
+        String source = tuple.getSourceStreamId();
 
-        insert(list.get(timeUnit), latitude, longitude);
+        if (source.equals(PlaceBolt.STREAM))
+        {
+            String place = tuple.getString(0);
+
+            tryUpdateCount(placesMap, place);
+        }
+        else if (source.equals(TimeUnitBolt.STREAM))
+        {
+            int timeUnit = tuple.getInteger(0);
+            double latitude = tuple.getDouble(1);
+            double longitude = tuple.getDouble(2);
+
+            list.get(timeUnit).add(new SpatialData(latitude, longitude));
+        }
+        else
+        {
+            String day = tuple.getString(0);
+            String hour = tuple.getString(1);
+            String min = tuple.getString(2);
+
+            updateCount(daysMap, day);
+            updateCount(hoursMap, hour);
+            updateCount(minsMap, min);
+        }
     }
 
     @Override
@@ -116,12 +184,23 @@ public class ResultBolt extends BaseBasicBolt
     @Override
     public void cleanup()
     {
-
         super.cleanup();
     }
 
-    private void insert(ArrayList<SpatialData> innerList, double lat, double lng)
+
+    private void tryUpdateCount(HashMap<String, Integer> map, String key)
     {
-        innerList.add(new SpatialData(lat, lng));
+        if (!map.containsKey(key))
+            map.put(key, 0);
+
+        updateCount(map, key);
     }
+
+    private void updateCount(HashMap<String, Integer> map, String key)
+    {
+        Integer value = map.get(key);
+        ++value;
+        map.put(key, value);
+    }
+
 }
