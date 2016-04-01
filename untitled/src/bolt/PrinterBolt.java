@@ -31,7 +31,7 @@ public class PrinterBolt extends BaseRichBolt
     {
         Status status = (Status) tuple.getValue(0);
 
-        if (status.getGeoLocation() != null)
+        if (status.getGeoLocation() != null && status.getPlace() != null)
         {
             System.out.println("(" + status.getGeoLocation().getLatitude() + ", "
                     + status.getGeoLocation().getLongitude() + ") - " + status.getPlace().getName() + " - "  + status.getText());

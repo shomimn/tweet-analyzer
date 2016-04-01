@@ -1,9 +1,19 @@
+var CONSTANT =
+{
+    PLACES: "places",
+    DAYS: "days",
+    HOURS: "hours",
+    MINUTES: "minutes"
+};
+
 var heatmap;
 var heatmapArray = [];
 var heatRadius = 10;
-var currentLayer = 0;
+var currentLayer = -1;
 var map;
 var dataTables = {};
+var charts = { current: ''};
+var indices = {};
 var playingAnim = null;
 var test = '';
 
@@ -15,7 +25,15 @@ window.onload = function ()
     {
         var timePoint = $(this).val();
         
-        drawChart("bar-chart", "charts", "Bar", dataTables[timePoint],
+//        $.each(charts, function(key, value)
+//        {
+//            if (key !== timePoint && key !== CONSTANT.PLACES)
+//                charts[key] = null;
+//        });
+        charts[charts.current] = null;
+        charts.current = timePoint;
+        
+        drawChart("bar-chart", "charts", "Bar", timePoint,
           { chart: { title: "Tweets per " + timePoint.substr(0, timePoint.length - 1) } });
     });
     
@@ -29,16 +47,27 @@ window.onload = function ()
     {
         var data = JSON.parse(msg.data);
         
-        createDataTables(data);
         addPointsOnMap(data.timeUnits);
         
-        drawChart("pie-chart", "visualization", "PieChart", dataTables["places"],
-                  { title: "Tweets per neighbourhood", pieHole: 0.4 });
+        $.each(data.places, function(key, value)
+        {
+            updateChart(CONSTANT.PLACES, key, value);
+        });
         
-        drawChart("bar-chart", "charts", "Bar", dataTables["minutes"],
-                  { chart: { title: "Tweets per minute" } });
-    
-        $("#timeSelect").val("minutes");
+        $.each(data.timePoints.days, function(key, value)
+        {
+            updateChart(CONSTANT.DAYS, key, value);
+        });
+        
+        $.each(data.timePoints.hours, function(key, value)
+        {
+            updateChart(CONSTANT.HOURS, key, value);
+        });
+        
+        $.each(data.timePoints.mins, function(key, value)
+        {
+            updateChart(CONSTANT.MINUTES, key, value);
+        });
     }
     console.log("ovde radi");
     
@@ -47,37 +76,57 @@ window.onload = function ()
 //    createDataTables(data);
 //    addPointsOnMap(data.timeUnits);
 //        
-//    drawChart("pie-chart", "visualization", "PieChart", dataTables["places"],
+//    drawChart("pie-chart", "visualization", "PieChart", CONSTANT.PLACES,
 //                  { title: "Tweets per neighbourhood", pieHole: 0.4 });
 //        
-//    drawChart("bar-chart", "charts", "Bar", dataTables["minutes"],
+//    drawChart("bar-chart", "charts", "Bar", CONSTANT.MINUTES,
 //                  { chart: { title: "Tweets per minute" } });
-//    
-//    $("#timeSelect").val("minutes");
+    
+
+    createDataTables();
+    
+    drawChart("bar-chart", "charts", "Bar", CONSTANT.MINUTES,                  
+                  { chart: { title: "Tweets per minute" } });
+    
+    drawChart("pie-chart", "visualization", "PieChart", CONSTANT.PLACES,
+                  { title: "Tweets per neighbourhood", pieHole: 0.4 });
+    
+    $("#timeSelect").val(CONSTANT.MINUTES);
+    charts.current = CONSTANT.MINUTES;
 }
 
-function createDataTables(data)
+function createDataTables()
 {
-    dataTables["places"] = [["Places", "Number of tweets"]];
-    dataTables["days"] = [["Days", "Number of tweets"]];
-    dataTables["hours"] = [["Hours", "Number of tweets"]];
-    dataTables["minutes"] = [["Minutes", "Number of tweets"]];
+    dataTables[CONSTANT.PLACES] = [["Places", "Number of tweets"], ["dummy", 0]];
+    dataTables[CONSTANT.DAYS] = [["Days", "Number of tweets"]];
+    dataTables[CONSTANT.HOURS] = [["Hours", "Number of tweets"]];
+    dataTables[CONSTANT.MINUTES] = [["Minutes", "Number of tweets"]];
     
-    var orderedDays = sortDays(data.timePoints.days);
-    var orderedHours = sortObject(data.timePoints.hours);
-    var orderedMinutes = sortObject(data.timePoints.mins);
+    var orderedDays = { Monday:0, Tuesday:0, Wednesday:0, Thursday:0, Friday:0, Saturday:0, Sunday:0 };
+    var orderedHours = {};
+    var orderedMinutes = {};
     
-    objectToDataTable(data.places, "places");
-    objectToDataTable(orderedDays, "days");
-    objectToDataTable(orderedHours, "hours");
-    objectToDataTable(orderedMinutes, "minutes");
+    for (var i = 1; i < 25; ++i)
+        orderedHours[i] = 0;
+    
+    for (var i = 0; i < 60; ++i)
+        orderedMinutes[i] = 0;
+    
+    objectToDataTable(orderedDays, CONSTANT.DAYS);
+    objectToDataTable(orderedHours, CONSTANT.HOURS);
+    objectToDataTable(orderedMinutes, CONSTANT.MINUTES);
+    objectToDataTable({}, CONSTANT.PLACES);
+    
+    dataTables[CONSTANT.PLACES].removeRow(0);
 }
 
 function objectToDataTable(obj, table)
 {
+    indices[table] = {current: 0};
     $.each(obj, function(key, value)
     {
         dataTables[table].push([key, value]);
+        indices[table][key] = indices[table].current++;
     });
     
     dataTables[table] = google.visualization.arrayToDataTable(dataTables[table]);
@@ -105,10 +154,28 @@ function sortDays(obj)
     return orderedDays;
 }
 
-function drawChart(id, lib, type, data, options)
+function drawChart(id, lib, type, table, options)
 {
     var chart = new google[lib][type](document.getElementById(id));
-    chart.draw(data, options);
+    chart.draw(dataTables[table], options);
+    
+    charts[table] = chart;
+}
+
+function updateChart(table, columnName, value)
+{
+    var index = indices[table][columnName];
+    if (index === undefined)
+    {
+        indices[table][columnName] = index = indices[table].current++;
+        dataTables[table].addRow([columnName, 0]);
+    }
+    var oldValue = dataTables[table].getValue(index, 1);
+    
+    dataTables[table].setValue(index, 1, oldValue + value);
+    
+    if (charts[table])
+        charts[table].draw(dataTables[table]);
 }
 
 function initMap()
@@ -168,29 +235,53 @@ function getPoints()
         ];
 }
 
+//function addPointsOnMap(dataArray)
+//{
+//    for(var i=0; i<dataArray.length; ++i)
+//    {
+//        var latLngArray = [];
+//        
+//        var data = dataArray[i];
+//        for(var j=0; j<data.length; ++j)
+//        {
+//            var lat = data[j].latitude;
+//            var lon = data[j].longitude;
+//            
+//            latLngArray.push(new google.maps.LatLng(lat, lon));
+//        }
+//        
+//        var hmap = new google.maps.visualization.HeatmapLayer({
+//          data: latLngArray,
+//          map: null
+//        });
+//        
+//        heatmapArray.push(hmap);
+//    }
+//    heatmapArray[currentLayer].setMap(map);
+//}
+
 function addPointsOnMap(dataArray)
 {
+    var latLngArray = [];
+
     for(var i=0; i<dataArray.length; ++i)
-    {
-        var latLngArray = [];
-        
+    {        
         var data = dataArray[i];
-        for(var j=0; j<data.length; ++j)
-        {
-            var lat = data[j].latitude;
-            var lon = data[j].longitude;
-            
-            latLngArray.push(new google.maps.LatLng(lat, lon));
-        }
-        
-        var hmap = new google.maps.visualization.HeatmapLayer({
+        latLngArray.push(new google.maps.LatLng(data.latitude, data.longitude));
+    }
+    
+    var hmap = new google.maps.visualization.HeatmapLayer({
           data: latLngArray,
           map: null
-        });
-        
-        heatmapArray.push(hmap);
-    }
-    heatmapArray[currentLayer].setMap(map);
+    });
+                
+    heatmapArray.push(hmap);
+    
+    if (heatmapArray[currentLayer])
+        heatmapArray[currentLayer].setMap(null);
+    heatmapArray[++currentLayer].setMap(map);
+    
+    $("#layer-id").val(currentLayer);
 }
 
 function showLayer()

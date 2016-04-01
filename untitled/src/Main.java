@@ -12,7 +12,7 @@ import util.TimeFragmenter;
 
 public class Main
 {
-    public static final int DURATION = 1800000;
+    public static final int DURATION = 300000;
     public static final int TIME_UNITS = 5;
 
     public static void main(String[] args) throws Exception
@@ -56,6 +56,6 @@ public class Main
 
         Utils.sleep(DURATION);
 
-        cluster.shutdown();
+//        cluster.shutdown();
     }
 }

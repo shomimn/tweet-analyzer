@@ -51,13 +51,15 @@ public class ResultBolt extends BaseBasicBolt
     private int duration;
     private int timeUnits;
 
-    private ArrayList<ArrayList<SpatialData>> list = new ArrayList<>();
+//    private ArrayList<ArrayList<SpatialData>> list = new ArrayList<>();
+    private ArrayList<SpatialData> list = new ArrayList<>();
     private HashMap<String, Integer> placesMap = new HashMap<>();
     private HashMap<String, Integer> daysMap = new HashMap<>();
     private HashMap<String, Integer> hoursMap = new HashMap<>();
     private HashMap<String, Integer> minsMap = new HashMap<>();
 
-    private Type listType = new TypeToken<ArrayList<ArrayList<SpatialData>>>(){}.getType();
+//    private Type listType = new TypeToken<ArrayList<ArrayList<SpatialData>>>(){}.getType();
+    private Type listType = new TypeToken<ArrayList<SpatialData>>(){}.getType();
     private Type mapType = new TypeToken<HashMap<String, Integer>>(){}.getType();
 
     public ResultBolt(int d, int units)
@@ -65,8 +67,8 @@ public class ResultBolt extends BaseBasicBolt
         duration = d;
         timeUnits = units;
 
-        for (int i = 0; i < timeUnits; ++i)
-            list.add(new ArrayList<>());
+//        for (int i = 0; i < timeUnits; ++i)
+//            list.add(new ArrayList<>());
 
         initMaps();
     }
@@ -103,7 +105,7 @@ public class ResultBolt extends BaseBasicBolt
             e.printStackTrace();
         }
 
-        new Timer().schedule(new TimerTask()
+        new Timer().scheduleAtFixedRate(new TimerTask()
         {
             @Override
             public void run()
@@ -132,16 +134,37 @@ public class ResultBolt extends BaseBasicBolt
 
                 server.sendToAll(json);
 
-                try
+                synchronized (this)
                 {
-                    server.stop();
+                    list.clear();
+
+//                    for (Map.Entry<String, Integer> entry : placesMap.entrySet())
+//                        placesMap.put(entry.getKey(), 0);
+//
+//                    for (Map.Entry<String, Integer> entry : daysMap.entrySet())
+//                        daysMap.put(entry.getKey(), 0);
+//
+//                    for (Map.Entry<String, Integer> entry : hoursMap.entrySet())
+//                        hoursMap.put(entry.getKey(), 0);
+//
+//                    for (Map.Entry<String, Integer> entry : minsMap.entrySet())
+//                        minsMap.put(entry.getKey(), 0);
+                    placesMap.clear();
+                    daysMap.clear();
+                    hoursMap.clear();
+                    minsMap.clear();
                 }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
+
+//                try
+//                {
+//                    server.stop();
+//                }
+//                catch (Exception e)
+//                {
+//                    e.printStackTrace();
+//                }
             }
-        }, duration);
+        }, 60000, 60000);
     }
 
     @Override
@@ -149,29 +172,33 @@ public class ResultBolt extends BaseBasicBolt
     {
         String source = tuple.getSourceStreamId();
 
-        if (source.equals(PlaceBolt.STREAM))
+        synchronized (this)
         {
-            String place = tuple.getString(0);
+            if (source.equals(PlaceBolt.STREAM))
+            {
+                String place = tuple.getString(0);
 
-            tryUpdateCount(placesMap, place);
-        }
-        else if (source.equals(TimeUnitBolt.STREAM))
-        {
-            int timeUnit = tuple.getInteger(0);
-            double latitude = tuple.getDouble(1);
-            double longitude = tuple.getDouble(2);
+                tryUpdateCount(placesMap, place);
+            }
+            else if (source.equals(TimeUnitBolt.STREAM))
+            {
+                int timeUnit = tuple.getInteger(0);
+                double latitude = tuple.getDouble(1);
+                double longitude = tuple.getDouble(2);
 
-            list.get(timeUnit).add(new SpatialData(latitude, longitude));
-        }
-        else
-        {
-            String day = tuple.getString(0);
-            String hour = tuple.getString(1);
-            String min = tuple.getString(2);
+//            list.get(timeUnit).add(new SpatialData(latitude, longitude));
+                list.add(new SpatialData(latitude, longitude));
+            }
+            else
+            {
+                String day = tuple.getString(0);
+                String hour = tuple.getString(1);
+                String min = tuple.getString(2);
 
-            updateCount(daysMap, day);
-            updateCount(hoursMap, hour);
-            updateCount(minsMap, min);
+                tryUpdateCount(daysMap, day);
+                tryUpdateCount(hoursMap, hour);
+                tryUpdateCount(minsMap, min);
+            }
         }
     }
 
