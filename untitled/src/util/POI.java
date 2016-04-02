@@ -1,5 +1,7 @@
 package util;
 
+import java.io.Serializable;
+
 public class POI
 {
     private double latitude;

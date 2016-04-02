@@ -9,6 +9,7 @@ import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import twitter4j.Status;
+import util.POIRepository;
 import util.TimeFragmenter;
 
 public class TimePointBolt extends BaseRichBolt

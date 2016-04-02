@@ -67,9 +67,6 @@ public class ResultBolt extends BaseBasicBolt
         duration = d;
         timeUnits = units;
 
-//        for (int i = 0; i < timeUnits; ++i)
-//            list.add(new ArrayList<>());
-
         initMaps();
     }
 
@@ -137,34 +134,13 @@ public class ResultBolt extends BaseBasicBolt
                 synchronized (this)
                 {
                     list.clear();
-
-//                    for (Map.Entry<String, Integer> entry : placesMap.entrySet())
-//                        placesMap.put(entry.getKey(), 0);
-//
-//                    for (Map.Entry<String, Integer> entry : daysMap.entrySet())
-//                        daysMap.put(entry.getKey(), 0);
-//
-//                    for (Map.Entry<String, Integer> entry : hoursMap.entrySet())
-//                        hoursMap.put(entry.getKey(), 0);
-//
-//                    for (Map.Entry<String, Integer> entry : minsMap.entrySet())
-//                        minsMap.put(entry.getKey(), 0);
                     placesMap.clear();
                     daysMap.clear();
                     hoursMap.clear();
                     minsMap.clear();
                 }
-
-//                try
-//                {
-//                    server.stop();
-//                }
-//                catch (Exception e)
-//                {
-//                    e.printStackTrace();
-//                }
             }
-        }, 60000, 60000);
+        }, 5 * 60000, 5 * 60000);
     }
 
     @Override
