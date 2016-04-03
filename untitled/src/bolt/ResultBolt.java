@@ -162,7 +162,6 @@ public class ResultBolt extends BaseBasicBolt
                 double latitude = tuple.getDouble(1);
                 double longitude = tuple.getDouble(2);
 
-//            list.get(timeUnit).add(new SpatialData(latitude, longitude));
                 list.add(new SpatialData(latitude, longitude));
             }
             else

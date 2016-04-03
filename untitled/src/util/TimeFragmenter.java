@@ -14,7 +14,7 @@ public class TimeFragmenter implements Serializable
 
     public Date nextDateTime;
 
-    public final String[] days = new String[] { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+    public final String[] days = new String[] { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
 
     public TimeFragmenter(int d, int units)
     {
@@ -38,7 +38,7 @@ public class TimeFragmenter implements Serializable
 
     public Values getFragments(Date date)
     {
-        String day = days[date.getDay() - 1];
+        String day = days[date.getDay()];
         String hour = String.valueOf(date.getHours());
         String minutes =  String.valueOf(date.getMinutes());
 
