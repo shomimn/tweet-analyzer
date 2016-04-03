@@ -140,7 +140,7 @@ public class ResultBolt extends BaseBasicBolt
                     minsMap.clear();
                 }
             }
-        }, 5 * 60000, 5 * 60000);
+        }, 1 * 60000, 1 * 60000);
     }
 
     @Override
