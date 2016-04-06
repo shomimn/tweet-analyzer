@@ -3,6 +3,7 @@ package bolt;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 import org.apache.storm.shade.org.joda.time.Days;
@@ -21,11 +22,13 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Tuple;
 import server.WebServer;
+import util.OptionsHandler;
 
 
-public class ResultBolt extends BaseBasicBolt
+public class ResultBolt extends BaseBasicBolt implements OptionsHandler
 {
     public static final String ID = "resultBolt";
+    public static final long MINUTE = 60000;
 
     public static class SpatialData
     {
@@ -48,61 +51,26 @@ public class ResultBolt extends BaseBasicBolt
     }
 
     private WebServer server;
-    private int duration;
-    private int timeUnits;
 
-//    private ArrayList<ArrayList<SpatialData>> list = new ArrayList<>();
     private ArrayList<SpatialData> list = new ArrayList<>();
     private HashMap<String, Integer> placesMap = new HashMap<>();
     private HashMap<String, Integer> daysMap = new HashMap<>();
     private HashMap<String, Integer> hoursMap = new HashMap<>();
     private HashMap<String, Integer> minsMap = new HashMap<>();
 
-//    private Type listType = new TypeToken<ArrayList<ArrayList<SpatialData>>>(){}.getType();
     private Type listType = new TypeToken<ArrayList<SpatialData>>(){}.getType();
     private Type mapType = new TypeToken<HashMap<String, Integer>>(){}.getType();
 
-    public ResultBolt(int d, int units)
-    {
-        duration = d;
-        timeUnits = units;
+    private Timer updateTimer;
+    private TimerTask updateTask;
 
-        initMaps();
+    public ResultBolt()
+    {
     }
 
-    private void initMaps()
+    private void createTask()
     {
-        daysMap.put("Monday", 0);
-        daysMap.put("Tuesday", 0);
-        daysMap.put("Wednesday", 0);
-        daysMap.put("Thursday", 0);
-        daysMap.put("Friday", 0);
-        daysMap.put("Saturday", 0);
-        daysMap.put("Sunday", 0);
-
-        for (int i = 1; i < 25; ++i)
-            hoursMap.put(String.valueOf(i), 0);
-
-        for (int i = 0; i < 60; ++i)
-            minsMap.put(String.valueOf(i), 0);
-    }
-
-    @Override
-    public void prepare(Map stormConf, TopologyContext context)
-    {
-        super.prepare(stormConf, context);
-
-        try
-        {
-            server = new WebServer(8888);
-            server.start();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        new Timer().scheduleAtFixedRate(new TimerTask()
+        updateTask = new TimerTask()
         {
             @Override
             public void run()
@@ -140,7 +108,32 @@ public class ResultBolt extends BaseBasicBolt
                     minsMap.clear();
                 }
             }
-        }, 1 * 60000, 1 * 60000);
+        };
+    }
+
+    private void scheduleTask(long interval)
+    {
+        updateTimer.scheduleAtFixedRate(updateTask, interval, interval);
+    }
+
+    @Override
+    public void prepare(Map stormConf, TopologyContext context)
+    {
+        super.prepare(stormConf, context);
+
+        try
+        {
+            server = new WebServer(this, 8888);
+            server.start();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        updateTimer = new Timer();
+        createTask();
+        scheduleTask(1 * MINUTE);
     }
 
     @Override
@@ -203,6 +196,16 @@ public class ResultBolt extends BaseBasicBolt
         Integer value = map.get(key);
         ++value;
         map.put(key, value);
+    }
+
+    @Override
+    public void changeUpdateInterval(String json)
+    {
+        long millis = new JsonParser().parse(json).getAsJsonObject().get("interval").getAsLong();
+
+        updateTask.cancel();
+        createTask();
+        updateTimer.scheduleAtFixedRate(updateTask, millis, millis);
     }
 
 }

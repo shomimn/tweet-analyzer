@@ -110,7 +110,7 @@ public class Main
         builder.setBolt(TimePointBolt.ID, new TimePointBolt(fragmenter))
                 .shuffleGrouping(PrinterBolt.ID, PrinterBolt.TIME_POINT_STREAM);
 
-        builder.setBolt(ResultBolt.ID, new ResultBolt(DURATION, TIME_UNITS), 1)
+        builder.setBolt(ResultBolt.ID, new ResultBolt(), 1)
                 .shuffleGrouping(TimeUnitBolt.ID, TimeUnitBolt.STREAM)
                 .shuffleGrouping(PlaceBolt.ID, PlaceBolt.STREAM)
                 .shuffleGrouping(TimePointBolt.ID, TimePointBolt.STREAM);

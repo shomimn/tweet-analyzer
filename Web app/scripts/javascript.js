@@ -6,6 +6,11 @@ var CONSTANT =
     MINUTES: "minutes"
 };
 
+var REQUEST =
+{
+    UPDATE_INTERVAL: "changeUpdateInterval"
+};
+
 var heatmap;
 var heatmapArray = [];
 var heatRadius = 10;
@@ -17,6 +22,7 @@ var indices = {};
 var playingAnim = null;
 var test = '';
 var newHeatmap = true;
+var socket = null;
 
 google.charts.load("current", {packages:["corechart", "bar"]});
 
@@ -39,7 +45,7 @@ window.onload = function ()
         console.log(newHeatmap);
     });
     
-    var socket = new WebSocket("ws://localhost:8888");
+    socket = new WebSocket("ws://localhost:8888");
             
     socket.onopen = function(event)
     {
@@ -95,6 +101,13 @@ window.onload = function ()
     
     $("#timeSelect").val(CONSTANT.MINUTES);
     charts.current = CONSTANT.MINUTES;
+}
+
+function changeInterval()
+{
+    var interval = parseInt($("#updateInterval").val());
+    
+    socket.send(JSON.stringify({ request: REQUEST.UPDATE_INTERVAL, data: { interval: interval } }));
 }
 
 function createDataTables()
