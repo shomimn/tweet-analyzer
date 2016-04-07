@@ -7,6 +7,9 @@
 .idea/dictionaries
 .idea/vcs.xml
 .idea/jsLibraryMappings.xml
+appconfig
+vehicles.txt
+trip_data_1.csv
 
 # Sensitive or high-churn files:
 .idea/dataSources.ids

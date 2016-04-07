@@ -81,39 +81,39 @@ public class Main
         String[] keyWords = new String[] { };
 
         AppConfig appConfig = new AppConfig();
-        appConfig.readFromFile("appconfig");
+        appConfig.readFromFile("appconfig.txt");
 
-//        BrokerHosts hosts = new ZkHosts("localhost:2181");
-//        SpoutConfig spoutConfig = new SpoutConfig(hosts, TAXI_TOPIC, "/" + TAXI_TOPIC, UUID.randomUUID().toString());
-//        spoutConfig.scheme = new SchemeAsMultiScheme(new TaxiScheme());
-//        KafkaSpout kafkaSpout = new KafkaSpout(spoutConfig);
+        BrokerHosts hosts = new ZkHosts("localhost:2181");
+        SpoutConfig spoutConfig = new SpoutConfig(hosts, TAXI_TOPIC, "/" + TAXI_TOPIC, UUID.randomUUID().toString());
+        spoutConfig.scheme = new SchemeAsMultiScheme(new TaxiScheme());
+        KafkaSpout kafkaSpout = new KafkaSpout(spoutConfig);
+
+        builder.setSpout("kafkaSpout", kafkaSpout);
+
+        builder.setBolt("testBolt", new TestBolt())
+                .shuffleGrouping("kafkaSpout");
+
+//        TimeFragmenter fragmenter = new TimeFragmenter(DURATION, TIME_UNITS);
 //
-//        builder.setSpout("kafkaSpout", kafkaSpout);
+//        builder.setSpout(TwitterSpout.ID, new TwitterSpout(appConfig.consumerKey, appConfig.consumerSecret,
+//                appConfig.accessToken, appConfig.accessTokenSecret, keyWords));
 //
-//        builder.setBolt("testBolt", new TestBolt())
-//                .shuffleGrouping("kafkaSpout");
-
-        TimeFragmenter fragmenter = new TimeFragmenter(DURATION, TIME_UNITS);
-
-        builder.setSpout(TwitterSpout.ID, new TwitterSpout(appConfig.consumerKey, appConfig.consumerSecret,
-                appConfig.accessToken, appConfig.accessTokenSecret, keyWords));
-
-        builder.setBolt(PrinterBolt.ID, new PrinterBolt())
-                .shuffleGrouping(TwitterSpout.ID);
-
-        builder.setBolt(TimeUnitBolt.ID, new TimeUnitBolt(fragmenter))
-                .shuffleGrouping(PrinterBolt.ID, PrinterBolt.TIME_UNIT_STREAM);
-
-        builder.setBolt(PlaceBolt.ID, new PlaceBolt())
-                .shuffleGrouping(PrinterBolt.ID, PrinterBolt.PLACE_STREAM);
-
-        builder.setBolt(TimePointBolt.ID, new TimePointBolt(fragmenter))
-                .shuffleGrouping(PrinterBolt.ID, PrinterBolt.TIME_POINT_STREAM);
-
-        builder.setBolt(ResultBolt.ID, new ResultBolt(DURATION, TIME_UNITS), 1)
-                .shuffleGrouping(TimeUnitBolt.ID, TimeUnitBolt.STREAM)
-                .shuffleGrouping(PlaceBolt.ID, PlaceBolt.STREAM)
-                .shuffleGrouping(TimePointBolt.ID, TimePointBolt.STREAM);
+//        builder.setBolt(PrinterBolt.ID, new PrinterBolt())
+//                .shuffleGrouping(TwitterSpout.ID);
+//
+//        builder.setBolt(TimeUnitBolt.ID, new TimeUnitBolt(fragmenter))
+//                .shuffleGrouping(PrinterBolt.ID, PrinterBolt.TIME_UNIT_STREAM);
+//
+//        builder.setBolt(PlaceBolt.ID, new PlaceBolt())
+//                .shuffleGrouping(PrinterBolt.ID, PrinterBolt.PLACE_STREAM);
+//
+//        builder.setBolt(TimePointBolt.ID, new TimePointBolt(fragmenter))
+//                .shuffleGrouping(PrinterBolt.ID, PrinterBolt.TIME_POINT_STREAM);
+//
+//        builder.setBolt(ResultBolt.ID, new ResultBolt(DURATION, TIME_UNITS), 1)
+//                .shuffleGrouping(TimeUnitBolt.ID, TimeUnitBolt.STREAM)
+//                .shuffleGrouping(PlaceBolt.ID, PlaceBolt.STREAM)
+//                .shuffleGrouping(TimePointBolt.ID, TimePointBolt.STREAM);
 
         Config config = new Config();
 //        config.setDebug(true);

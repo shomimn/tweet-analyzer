@@ -34,7 +34,7 @@ public class POIRepository
     {
         try (BufferedReader reader = new BufferedReader(
 //                new FileReader("/home/milos/IdeaProjects/tweet-analyzer/new-york.csv")))
-                new FileReader("/home/milos/IdeaProjects/tweet-analyzer/ny.csv")))
+                new FileReader("/home/milan/tweet-analyzer/ny.csv")))
         {
             String line;
             quadEnvelope = new Envelope2D(Double.MAX_VALUE, Double.MAX_VALUE,
