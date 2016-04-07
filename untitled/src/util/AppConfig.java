@@ -10,6 +10,7 @@ public class AppConfig
     public String consumerSecret;
     public String accessToken;
     public String accessTokenSecret;
+    public String poiPath;
 
     public AppConfig()
     {

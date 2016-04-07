@@ -86,7 +86,7 @@ public class Main
         builder.setBolt(PrinterBolt.ID, new PrinterBolt())
                 .shuffleGrouping(TwitterSpout.ID);
 
-        builder.setBolt(LatLngBolt.ID, new LatLngBolt(fragmenter))
+        builder.setBolt(LatLngBolt.ID, new LatLngBolt(fragmenter, appConfig.poiPath))
                 .shuffleGrouping(PrinterBolt.ID, PrinterBolt.TIME_UNIT_STREAM);
 
         builder.setBolt(PlaceBolt.ID, new PlaceBolt())

@@ -23,9 +23,11 @@ public class POIRepository
     private QuadTree quadTree;
     private Envelope2D quadEnvelope;
     private ArrayList<POI> pois = new ArrayList<>();
+    private String path;
 
-    public POIRepository()
+    public POIRepository(String poiPath)
     {
+        path = poiPath;
         readFile();
         createQuadTree();
     }
@@ -34,7 +36,8 @@ public class POIRepository
     {
         try (BufferedReader reader = new BufferedReader(
 //                new FileReader("/home/milos/IdeaProjects/tweet-analyzer/new-york.csv")))
-                new FileReader("/home/milos/IdeaProjects/tweet-analyzer/ny.csv")))
+//                new FileReader("/home/milos/IdeaProjects/tweet-analyzer/ny.csv")))
+                new FileReader(path)))
         {
             String line;
             quadEnvelope = new Envelope2D(Double.MAX_VALUE, Double.MAX_VALUE,

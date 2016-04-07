@@ -24,10 +24,12 @@ public class LatLngBolt extends BaseRichBolt
     private OutputCollector collector;
     private TimeFragmenter fragmenter;
     private POIRepository repository;
+    private String path;
 
-    public LatLngBolt(TimeFragmenter timeFragmenter)
+    public LatLngBolt(TimeFragmenter timeFragmenter, String poiPath)
     {
         fragmenter = timeFragmenter;
+        path = poiPath;
     }
 
     @Override
@@ -40,7 +42,7 @@ public class LatLngBolt extends BaseRichBolt
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector)
     {
         collector = outputCollector;
-        repository = new POIRepository();
+        repository = new POIRepository(path);
     }
 
     @Override
