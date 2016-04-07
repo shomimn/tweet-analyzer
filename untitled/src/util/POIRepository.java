@@ -101,9 +101,9 @@ public class POIRepository
         return it.next();
     }
 
-    public String get(int handle)
+    public POI get(int handle)
     {
-        return pois.get(quadTree.getElement(handle)).getName();
+        return pois.get(quadTree.getElement(handle));
     }
 
     public boolean isValid(int handle)

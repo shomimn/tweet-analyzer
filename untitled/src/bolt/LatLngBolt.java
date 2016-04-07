@@ -16,16 +16,16 @@ import twitter4j.Status;
 import util.POIRepository;
 import util.TimeFragmenter;
 
-public class TimeUnitBolt extends BaseRichBolt
+public class LatLngBolt extends BaseRichBolt
 {
-    public static final String ID = "timeUnitBolt";
-    public static final String STREAM = "timeUnitStream";
+    public static final String ID = "latLngBolt";
+    public static final String STREAM = "latLngStream";
 
     private OutputCollector collector;
     private TimeFragmenter fragmenter;
     private POIRepository repository;
 
-    public TimeUnitBolt(TimeFragmenter timeFragmenter)
+    public LatLngBolt(TimeFragmenter timeFragmenter)
     {
         fragmenter = timeFragmenter;
     }
@@ -33,7 +33,7 @@ public class TimeUnitBolt extends BaseRichBolt
     @Override
     public void declareOutputFields(OutputFieldsDeclarer ofd)
     {
-        ofd.declareStream(STREAM, new Fields("timeUnit", "latitude", "longitude"));
+        ofd.declareStream(STREAM, new Fields("latitude", "longitude"));
     }
 
     @Override
@@ -56,10 +56,9 @@ public class TimeUnitBolt extends BaseRichBolt
 
         int handle = repository.query(lat, lng);
         if (repository.isValid(handle))
-            System.out.println("POI: " +repository.get(handle));
+            System.out.println("POI: " + repository.get(handle).getName());
 
-        collector.emit(STREAM, new Values(fragmenter.currentStep,
-                status.getGeoLocation().getLatitude(),
+        collector.emit(STREAM, new Values(status.getGeoLocation().getLatitude(),
                 status.getGeoLocation().getLongitude()));
     }
 }

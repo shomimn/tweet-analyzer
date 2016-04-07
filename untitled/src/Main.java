@@ -1,35 +1,20 @@
-import com.esotericsoftware.kryo.io.Output;
-
-import java.lang.reflect.Field;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
-import backtype.storm.spout.Scheme;
-import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.IRichBolt;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.TopologyBuilder;
-import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 import bolt.PlaceBolt;
 import bolt.PrinterBolt;
 import bolt.ResultBolt;
 import bolt.TimePointBolt;
-import bolt.TimeUnitBolt;
-import scheme.TaxiScheme;
+import bolt.LatLngBolt;
 import spout.TwitterSpout;
-import storm.kafka.BrokerHosts;
-import storm.kafka.KafkaSpout;
-import storm.kafka.SpoutConfig;
-import storm.kafka.StringScheme;
-import storm.kafka.ZkHosts;
 import util.AppConfig;
 import util.TimeFragmenter;
 
@@ -101,7 +86,7 @@ public class Main
         builder.setBolt(PrinterBolt.ID, new PrinterBolt())
                 .shuffleGrouping(TwitterSpout.ID);
 
-        builder.setBolt(TimeUnitBolt.ID, new TimeUnitBolt(fragmenter))
+        builder.setBolt(LatLngBolt.ID, new LatLngBolt(fragmenter))
                 .shuffleGrouping(PrinterBolt.ID, PrinterBolt.TIME_UNIT_STREAM);
 
         builder.setBolt(PlaceBolt.ID, new PlaceBolt())
@@ -111,7 +96,7 @@ public class Main
                 .shuffleGrouping(PrinterBolt.ID, PrinterBolt.TIME_POINT_STREAM);
 
         builder.setBolt(ResultBolt.ID, new ResultBolt(), 1)
-                .shuffleGrouping(TimeUnitBolt.ID, TimeUnitBolt.STREAM)
+                .shuffleGrouping(LatLngBolt.ID, LatLngBolt.STREAM)
                 .shuffleGrouping(PlaceBolt.ID, PlaceBolt.STREAM)
                 .shuffleGrouping(TimePointBolt.ID, TimePointBolt.STREAM);
 

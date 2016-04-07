@@ -6,8 +6,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
-import org.apache.storm.shade.org.joda.time.Days;
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
@@ -90,7 +88,7 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
                 timePoints.add("mins", mins);
 
                 JsonObject root = new JsonObject();
-                root.add("timeUnits", timeUnits);
+                root.add("tweets", timeUnits);
                 root.add("places", places);
                 root.add("timePoints", timePoints);
 
@@ -149,11 +147,10 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
 
                 tryUpdateCount(placesMap, place);
             }
-            else if (source.equals(TimeUnitBolt.STREAM))
+            else if (source.equals(LatLngBolt.STREAM))
             {
-                int timeUnit = tuple.getInteger(0);
-                double latitude = tuple.getDouble(1);
-                double longitude = tuple.getDouble(2);
+                double latitude = tuple.getDouble(0);
+                double longitude = tuple.getDouble(1);
 
                 list.add(new SpatialData(latitude, longitude));
             }

@@ -55,7 +55,7 @@ window.onload = function ()
     {
         var data = JSON.parse(msg.data);
         
-        addPointsOnMap(data.timeUnits);
+        addPointsOnMap(data.tweets);
         
         $.each(data.places, function(key, value)
         {
@@ -82,7 +82,7 @@ window.onload = function ()
 //    var data = JSON.parse(test);
 //        
 //    createDataTables(data);
-//    addPointsOnMap(data.timeUnits);
+//    addPointsOnMap(data.tweets);
 //        
 //    drawChart("pie-chart", "visualization", "PieChart", CONSTANT.PLACES,
 //                  { title: "Tweets per neighbourhood", pieHole: 0.4 });
