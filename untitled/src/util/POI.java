@@ -2,7 +2,7 @@ package util;
 
 import java.io.Serializable;
 
-public class POI
+public class POI implements Serializable
 {
     private double latitude;
     private double longitude;
@@ -43,5 +43,27 @@ public class POI
     public void setName(String name)
     {
         this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == null)
+            return false;
+
+        if (!(obj instanceof POI))
+            return false;
+
+        POI other = (POI) obj;
+
+        return name.equals(other.getName()) &&
+                latitude == other.getLatitude() &&
+                longitude == other.getLongitude();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return name.hashCode() * (int) (latitude * longitude);
     }
 }
