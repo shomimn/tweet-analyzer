@@ -1,6 +1,5 @@
 <component name="libraryTable">
-  <library name="com.esri.geometry:esri-geometry-api:1.2.1" type="repository">
-    <properties maven-id="com.esri.geometry:esri-geometry-api:1.2.1" />
+  <library name="com.esri.geometry:esri-geometry-api:1.2.1">
     <CLASSES>
       <root url="jar://$MAVEN_REPOSITORY$/com/esri/geometry/esri-geometry-api/1.2.1/esri-geometry-api-1.2.1.jar!/" />
       <root url="jar://$MAVEN_REPOSITORY$/org/json/json/20090211/json-20090211.jar!/" />

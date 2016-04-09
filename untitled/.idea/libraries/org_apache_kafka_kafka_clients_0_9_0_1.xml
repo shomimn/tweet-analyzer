@@ -1,6 +1,5 @@
 <component name="libraryTable">
-  <library name="org.apache.kafka:kafka-clients:0.9.0.1" type="repository">
-    <properties maven-id="org.apache.kafka:kafka-clients:0.9.0.1" />
+  <library name="org.apache.kafka:kafka-clients:0.9.0.1">
     <CLASSES>
       <root url="jar://$MAVEN_REPOSITORY$/org/apache/kafka/kafka-clients/0.9.0.1/kafka-clients-0.9.0.1.jar!/" />
       <root url="jar://$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.6/slf4j-api-1.7.6.jar!/" />
