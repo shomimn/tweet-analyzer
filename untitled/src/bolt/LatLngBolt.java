@@ -48,19 +48,32 @@ public class LatLngBolt extends BaseRichBolt
     @Override
     public void execute(Tuple tuple)
     {
-        Status status = (Status) tuple.getValue(0);
-        double lat = status.getGeoLocation().getLatitude();
-        double lng = status.getGeoLocation().getLongitude();
-        Date date = status.getCreatedAt();
+        if(tuple.getSourceStreamId() == PrinterBolt.TIME_UNIT_STREAM)
+        {
+            Status status = (Status) tuple.getValue(0);
+            double lat = status.getGeoLocation().getLatitude();
+            double lng = status.getGeoLocation().getLongitude();
+            Date date = status.getCreatedAt();
 
-        if (date.after(fragmenter.nextDateTime))
-            fragmenter.advanceTimeLine();
+            if (date.after(fragmenter.nextDateTime))
+                fragmenter.advanceTimeLine();
 
-        int handle = repository.query(lat, lng);
-        if (repository.isValid(handle))
-            System.out.println("POI: " + repository.get(handle).getName());
+            int handle = repository.query(lat, lng);
+            if (repository.isValid(handle))
+                System.out.println("POI: " + repository.get(handle).getName());
 
-        collector.emit(STREAM, new Values(status.getGeoLocation().getLatitude(),
-                status.getGeoLocation().getLongitude()));
+            collector.emit(STREAM, new Values(status.getGeoLocation().getLatitude(),
+                    status.getGeoLocation().getLongitude()));
+        }
+        else if(tuple.getSourceStreamId() == TaxiBolt.TAXI_BOLT_STREAM)
+        {
+            double pickupLat = tuple.getDouble(0);
+            double pickupLon = tuple.getDouble(1);
+            double dropoffLat = tuple.getDouble(2);
+            double dropoffLon = tuple.getDouble(3);
+            DateTime dateTime = (DateTime) tuple.getValue(4);
+
+            System.out.println(tuple.toString());
+        }
     }
 }
