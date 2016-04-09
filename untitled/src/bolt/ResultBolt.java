@@ -68,6 +68,8 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
     private Timer updateTimer;
     private TimerTask updateTask;
 
+    private int tweetThreshold = 1;
+
     public ResultBolt()
     {
     }
@@ -81,7 +83,7 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
             {
                 Gson gson = new Gson();
 
-                clearBelowThreshold(twitterPoiMap);
+                clearBelowThreshold(twitterPoiMap, tweetThreshold);
 
                 System.out.println(list.size());
 //                System.out.println(gson.toJsonTree(twitterPoiMap.keySet(), poiType).toString());
@@ -168,7 +170,7 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
                 if (poi != null)
                 {
                     System.out.println("POI: " + poi.getName());
-                    tryUpdateCount(twitterPoiMap, poi);
+                    tryUpdateCount(twitterPoiMap, poi   );
                 }
 
                 list.add(new SpatialData(latitude, longitude));
@@ -214,13 +216,13 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
         map.put(key, value);
     }
 
-    private void clearBelowThreshold(HashMap<POI, Integer> map)
+    private void clearBelowThreshold(HashMap<POI, Integer> map, int threshold)
     {
         for (Iterator<Map.Entry<POI, Integer>> it = map.entrySet().iterator(); it.hasNext(); )
         {
             Map.Entry<POI, Integer> entry = it.next();
 
-            if (entry.getValue() < TWEET_THRESHOLD)
+            if (entry.getValue() < threshold)
                 it.remove();
         }
     }
@@ -233,6 +235,12 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
         updateTask.cancel();
         createTask();
         updateTimer.scheduleAtFixedRate(updateTask, millis, millis);
+    }
+
+    @Override
+    public void changeTweetThreshold(String json)
+    {
+        tweetThreshold = new JsonParser().parse(json).getAsJsonObject().get("threshold").getAsInt();
     }
 
 }
