@@ -9,9 +9,9 @@ public class Main
 
     public static void main(String[] args)
     {
-       TaxiProducer taxiProducer = new TaxiProducer();
         VehicleProducer vehicleProducer = new VehicleProducer();
-       taxiProducer.run();
         vehicleProducer.run();
+        TaxiProducer taxiProducer = new TaxiProducer();
+        taxiProducer.run();
     }
 }

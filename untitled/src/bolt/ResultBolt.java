@@ -1,5 +1,6 @@
 package bolt;
 
+import com.esri.core.geometry.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -19,12 +20,18 @@ import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Tuple;
+import org.apache.storm.shade.org.joda.time.DateTime;
 import server.WebServer;
+import twitter4j.Status;
 import util.OptionsHandler;
 
 
 public class ResultBolt extends BaseBasicBolt implements OptionsHandler
 {
+    private static final int SPATIAL_REF_WKID = 4326;
+    private static final double BUFFER_DISTANCE = 0.00055;
+    private static final int TIME_OFFSET = 240;
+
     public static final String ID = "resultBolt";
     public static final long MINUTE = 60000;
 
@@ -32,9 +39,9 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
     {
         public double latitude;
         public double longitude;
-        public Date date;
+        public DateTime date;
 
-        public SpatialData(double lat, double lng, Date d)
+        public SpatialData(double lat, double lng, DateTime d)
         {
             latitude = lat;
             longitude = lng;
@@ -48,9 +55,11 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
         }
     }
 
+
     private WebServer server;
 
     private ArrayList<SpatialData> list = new ArrayList<>();
+    private ArrayList<SpatialData> vehicleTweets = new ArrayList<>();
     private HashMap<String, Integer> placesMap = new HashMap<>();
     private HashMap<String, Integer> daysMap = new HashMap<>();
     private HashMap<String, Integer> hoursMap = new HashMap<>();
@@ -81,6 +90,7 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
                 JsonElement days = gson.toJsonTree(daysMap, mapType);
                 JsonElement hours = gson.toJsonTree(hoursMap, mapType);
                 JsonElement mins = gson.toJsonTree(minsMap, mapType);
+                JsonElement vehicles = gson.toJsonTree(vehicleTweets, listType);
 
                 JsonObject timePoints = new JsonObject();
                 timePoints.add("days", days);
@@ -91,6 +101,7 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
                 root.add("tweets", timeUnits);
                 root.add("places", places);
                 root.add("timePoints", timePoints);
+                root.add("vehiclesPOIS", vehicles);
 
                 String json = root.toString();
                 System.out.println(json);
@@ -104,6 +115,7 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
                     daysMap.clear();
                     hoursMap.clear();
                     minsMap.clear();
+                    vehicleTweets.clear();
                 }
             }
         };
@@ -151,10 +163,11 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
             {
                 double latitude = tuple.getDouble(0);
                 double longitude = tuple.getDouble(1);
+                DateTime date = (DateTime)tuple.getValue(2);
 
-                list.add(new SpatialData(latitude, longitude));
+                list.add(new SpatialData(latitude, longitude, date));
             }
-            else
+            else if(source.equals(TimePointBolt.STREAM))
             {
                 String day = tuple.getString(0);
                 String hour = tuple.getString(1);
@@ -163,6 +176,39 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
                 tryUpdateCount(daysMap, day);
                 tryUpdateCount(hoursMap, hour);
                 tryUpdateCount(minsMap, min);
+            }
+            else if(source.equals(VehicleBolt.STREAM))
+            {
+                long id = tuple.getLong(0);
+                long timestamp = tuple.getLong(1);
+                double latitude = tuple.getDouble(2);
+                double longitude = tuple.getDouble(3);
+                DateTime date = (DateTime)tuple.getValue(4);
+
+                SpatialReference ref = SpatialReference.create(SPATIAL_REF_WKID);
+                Envelope envelope = new Envelope();
+                Point p = new Point(latitude, longitude);
+                Geometry geom = OperatorBuffer.local().execute(p, ref, BUFFER_DISTANCE, null);
+                geom.queryEnvelope(envelope);
+
+                DateTime refDateMin = date.minusSeconds(TIME_OFFSET);
+                DateTime refDateMax = date.plusSeconds(TIME_OFFSET);
+
+                System.out.println(envelope.toString());
+
+                for (SpatialData data: list)
+                {
+                    if(envelope.contains(new Point(data.latitude,data.longitude)) && refDateMin.isBefore(data.date) && refDateMax.isAfter(data.date))
+                    {
+                        vehicleTweets.add(new SpatialData(latitude,longitude));
+                        System.out.println("TWEET FROM VEHICLE: LAT: " + latitude + " LON: " + longitude);
+                    }
+//                    if(envelope.contains(new Point(data.latitude,data.longitude)))
+//                    {
+//                        vehicleTweets.add(new SpatialData(latitude,longitude));
+//                        System.out.println("TWEET FROM VEHICLE: LAT: " + latitude + " LON: " + longitude);
+//                    }
+                }
             }
         }
     }

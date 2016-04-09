@@ -1,7 +1,9 @@
 import java.util.Map;
+import java.util.UUID;
 
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
+import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.IRichBolt;
@@ -9,12 +11,14 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.utils.Utils;
-import bolt.PlaceBolt;
-import bolt.PrinterBolt;
-import bolt.ResultBolt;
-import bolt.TimePointBolt;
-import bolt.LatLngBolt;
+import bolt.*;
+import scheme.TaxiScheme;
+import scheme.VehicleScheme;
 import spout.TwitterSpout;
+import storm.kafka.BrokerHosts;
+import storm.kafka.KafkaSpout;
+import storm.kafka.SpoutConfig;
+import storm.kafka.ZkHosts;
 import util.AppConfig;
 import util.TimeFragmenter;
 
@@ -58,6 +62,7 @@ public class Main
     public static final int DURATION = 300000;
     public static final int TIME_UNITS = 5;
     public static final String TAXI_TOPIC = "taxi-topic";
+    public static final String VEHICLE_TOPIC = "vehicle-topic";
 
     public static void main(String[] args) throws Exception
     {
@@ -68,15 +73,15 @@ public class Main
         AppConfig appConfig = new AppConfig();
         appConfig.readFromFile("appconfig");
 
-//        BrokerHosts hosts = new ZkHosts("localhost:2181");
-//        SpoutConfig spoutConfig = new SpoutConfig(hosts, TAXI_TOPIC, "/" + TAXI_TOPIC, UUID.randomUUID().toString());
-//        spoutConfig.scheme = new SchemeAsMultiScheme(new TaxiScheme());
-//        KafkaSpout kafkaSpout = new KafkaSpout(spoutConfig);
-//
-//        builder.setSpout("kafkaSpout", kafkaSpout);
-//
-//        builder.setBolt("testBolt", new TestBolt())
-//                .shuffleGrouping("kafkaSpout");
+        BrokerHosts hosts = new ZkHosts("localhost:2181");
+        SpoutConfig spoutConfigVehicle = new SpoutConfig(hosts, VEHICLE_TOPIC, "/" + VEHICLE_TOPIC, UUID.randomUUID().toString());
+        spoutConfigVehicle.scheme = new SchemeAsMultiScheme(new VehicleScheme());
+        KafkaSpout vehicleSpout = new KafkaSpout(spoutConfigVehicle);
+
+        builder.setSpout("vehicleSpout", vehicleSpout);
+
+        builder.setBolt(VehicleBolt.ID, new VehicleBolt())
+                .shuffleGrouping("vehicleSpout");
 
         TimeFragmenter fragmenter = new TimeFragmenter(DURATION, TIME_UNITS);
 
@@ -95,10 +100,13 @@ public class Main
         builder.setBolt(TimePointBolt.ID, new TimePointBolt(fragmenter))
                 .shuffleGrouping(PrinterBolt.ID, PrinterBolt.TIME_POINT_STREAM);
 
+
+
         builder.setBolt(ResultBolt.ID, new ResultBolt(), 1)
                 .shuffleGrouping(LatLngBolt.ID, LatLngBolt.STREAM)
                 .shuffleGrouping(PlaceBolt.ID, PlaceBolt.STREAM)
-                .shuffleGrouping(TimePointBolt.ID, TimePointBolt.STREAM);
+                .shuffleGrouping(TimePointBolt.ID, TimePointBolt.STREAM)
+                .shuffleGrouping(VehicleBolt.ID, VehicleBolt.STREAM);
 
         Config config = new Config();
 //        config.setDebug(true);

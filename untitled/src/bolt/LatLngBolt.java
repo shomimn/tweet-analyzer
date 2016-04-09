@@ -35,7 +35,7 @@ public class LatLngBolt extends BaseRichBolt
     @Override
     public void declareOutputFields(OutputFieldsDeclarer ofd)
     {
-        ofd.declareStream(STREAM, new Fields("latitude", "longitude"));
+        ofd.declareStream(STREAM, new Fields("latitude", "longitude","date"));
     }
 
     @Override
@@ -61,6 +61,6 @@ public class LatLngBolt extends BaseRichBolt
             System.out.println("POI: " + repository.get(handle).getName());
 
         collector.emit(STREAM, new Values(status.getGeoLocation().getLatitude(),
-                status.getGeoLocation().getLongitude()));
+                status.getGeoLocation().getLongitude(),new DateTime(status.getCreatedAt())));
     }
 }
