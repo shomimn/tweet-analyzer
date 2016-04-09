@@ -221,7 +221,7 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
 
                 DateTime refDateMin = date.minusSeconds(TIME_OFFSET);
                 DateTime refDateMax = date.plusSeconds(TIME_OFFSET);
-                
+
                 for (SpatialData data: list)
                 {
                     if(envelope.contains(new Point(data.latitude,data.longitude)) && refDateMin.isBefore(data.date) && refDateMax.isAfter(data.date))
