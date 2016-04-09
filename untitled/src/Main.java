@@ -23,6 +23,11 @@ import storm.kafka.KafkaSpout;
 import storm.kafka.KeyValueSchemeAsMultiScheme;
 import storm.kafka.SpoutConfig;
 import storm.kafka.ZkHosts;
+import bolt.*;
+import scheme.TaxiScheme;
+import scheme.VehicleScheme;
+import spout.TwitterSpout;
+import storm.kafka.*;
 import util.AppConfig;
 import util.TimeFragmenter;
 
@@ -65,7 +70,8 @@ public class Main
 {
     public static final int DURATION = 300000;
     public static final int TIME_UNITS = 5;
-    public static final String TAXI_TOPIC = "vehicle-topic";
+    public static final String TAXI_TOPIC = "taxi-topic";
+    public static final String VEHICLE_TOPIC = "vehicle-topic";
 
     public static void main(String[] args) throws Exception
     {
@@ -88,6 +94,16 @@ public class Main
 
         TimeFragmenter fragmenter = new TimeFragmenter(DURATION, TIME_UNITS);
 
+        BrokerHosts hosts = new ZkHosts("localhost:2181");
+        SpoutConfig spoutConfigVehicle = new SpoutConfig(hosts, VEHICLE_TOPIC, "/" + VEHICLE_TOPIC, UUID.randomUUID().toString());
+        spoutConfigVehicle.scheme = new KeyValueSchemeAsMultiScheme(new VehicleScheme());
+        KafkaSpout vehicleSpout = new KafkaSpout(spoutConfigVehicle);
+
+        builder.setSpout("vehicleSpout", vehicleSpout);
+
+        builder.setBolt(VehicleBolt.ID, new VehicleBolt())
+                .shuffleGrouping("vehicleSpout");
+
         builder.setSpout(TwitterSpout.ID, new TwitterSpout(appConfig.consumerKey, appConfig.consumerSecret,
                 appConfig.accessToken, appConfig.accessTokenSecret, keyWords));
 
@@ -106,7 +122,8 @@ public class Main
         builder.setBolt(ResultBolt.ID, new ResultBolt(), 1)
                 .shuffleGrouping(LatLngBolt.ID, LatLngBolt.STREAM)
                 .shuffleGrouping(PlaceBolt.ID, PlaceBolt.STREAM)
-                .shuffleGrouping(TimePointBolt.ID, TimePointBolt.STREAM);
+                .shuffleGrouping(TimePointBolt.ID, TimePointBolt.STREAM)
+                .shuffleGrouping(VehicleBolt.ID, VehicleBolt.STREAM);
 
         Config config = new Config();
 //        config.setDebug(true);
