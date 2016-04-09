@@ -83,7 +83,7 @@ public class VehicleProducer
 
             }
         });
-        thread.run();
+        thread.start();
 
     }
 
