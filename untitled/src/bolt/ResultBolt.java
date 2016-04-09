@@ -7,26 +7,26 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Tuple;
+import org.apache.storm.shade.org.joda.time.DateTime;
 import server.WebServer;
 import util.OptionsHandler;
+import util.POI;
 
 
 public class ResultBolt extends BaseBasicBolt implements OptionsHandler
 {
     public static final String ID = "resultBolt";
     public static final long MINUTE = 60000;
+    public static final int TWEET_THRESHOLD = 1;
+    public static final int TAXI_THRESHOLD = 1;
+    public int taxiCounter = 0;
 
     public static class SpatialData
     {
@@ -55,12 +55,18 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
     private HashMap<String, Integer> daysMap = new HashMap<>();
     private HashMap<String, Integer> hoursMap = new HashMap<>();
     private HashMap<String, Integer> minsMap = new HashMap<>();
+    private HashMap<POI, Integer> twitterPoiMap = new HashMap<>();
+    private HashMap<POI, Integer> taxiPoiMap = new HashMap<>();
 
     private Type listType = new TypeToken<ArrayList<SpatialData>>(){}.getType();
     private Type mapType = new TypeToken<HashMap<String, Integer>>(){}.getType();
+    private Type poiType = new TypeToken<Set<POI>>(){}.getType();
 
     private Timer updateTimer;
     private TimerTask updateTask;
+
+    private int tweetThreshold = 1;
+    private int taxiThreshold = 1;
 
     public ResultBolt()
     {
@@ -75,12 +81,26 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
             {
                 Gson gson = new Gson();
 
+                clearBelowThreshold(twitterPoiMap, tweetThreshold);
+                clearBelowThreshold(taxiPoiMap, taxiThreshold);
+
+
+                Set<POI> intersection = new HashSet<>(twitterPoiMap.keySet());
+                intersection.retainAll(taxiPoiMap.keySet());
+                twitterPoiMap.keySet().removeAll(intersection);
+                taxiPoiMap.keySet().removeAll(intersection);
+
+
                 System.out.println(list.size());
-                JsonElement timeUnits = gson.toJsonTree(list, listType);
+                System.out.println(gson.toJsonTree(taxiPoiMap.keySet(), poiType).toString());
+                JsonElement tweets = gson.toJsonTree(list, listType);
                 JsonElement places = gson.toJsonTree(placesMap, mapType);
                 JsonElement days = gson.toJsonTree(daysMap, mapType);
                 JsonElement hours = gson.toJsonTree(hoursMap, mapType);
                 JsonElement mins = gson.toJsonTree(minsMap, mapType);
+                JsonElement twitterPois = gson.toJsonTree(twitterPoiMap.keySet(), poiType);
+                JsonElement taxiPois = gson.toJsonTree(taxiPoiMap.keySet(), poiType);
+                JsonElement taxiTwitterPois = gson.toJsonTree(intersection);
 
                 JsonObject timePoints = new JsonObject();
                 timePoints.add("days", days);
@@ -88,9 +108,15 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
                 timePoints.add("mins", mins);
 
                 JsonObject root = new JsonObject();
-                root.add("tweets", timeUnits);
+                root.add("tweets", tweets);
                 root.add("places", places);
                 root.add("timePoints", timePoints);
+                root.add("twitterPois", twitterPois);
+                root.add("taxiPois", taxiPois);
+                root.add("taxiTwitterPois", taxiTwitterPois);
+                root.addProperty("taxiTotal", taxiCounter);
+
+
 
                 String json = root.toString();
                 System.out.println(json);
@@ -104,6 +130,9 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
                     daysMap.clear();
                     hoursMap.clear();
                     minsMap.clear();
+                    twitterPoiMap.clear();
+                    taxiPoiMap.clear();
+                    taxiCounter = 0;
                 }
             }
         };
@@ -151,8 +180,27 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
             {
                 double latitude = tuple.getDouble(0);
                 double longitude = tuple.getDouble(1);
+                POI poi = (POI) tuple.getValue(2);
+
+                if (poi != null)
+                {
+                    System.out.println("POI: " + poi.getName());
+                    tryUpdateCount(twitterPoiMap, poi);
+                }
 
                 list.add(new SpatialData(latitude, longitude));
+            }
+            else if(source.equals(LatLngBolt.TAXI_POI_STREAM))
+            {
+//                double latitude = tuple.getDouble(0);
+//                double longitude = tuple.getDouble(1);
+                taxiCounter++;
+                POI poi = (POI) tuple.getValue(2);
+
+//                DateTime dateTime = (DateTime) tuple.getValue(3);
+
+                if(poi != null)
+                    tryUpdateCount(taxiPoiMap, poi);
             }
             else
             {
@@ -180,7 +228,7 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
     }
 
 
-    private void tryUpdateCount(HashMap<String, Integer> map, String key)
+    private<T> void tryUpdateCount(HashMap<T, Integer> map, T key)
     {
         if (!map.containsKey(key))
             map.put(key, 0);
@@ -188,11 +236,22 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
         updateCount(map, key);
     }
 
-    private void updateCount(HashMap<String, Integer> map, String key)
+    private<T> void updateCount(HashMap<T, Integer> map, T key)
     {
         Integer value = map.get(key);
         ++value;
         map.put(key, value);
+    }
+
+    private void clearBelowThreshold(HashMap<POI, Integer> map, int threshold)
+    {
+        for (Iterator<Map.Entry<POI, Integer>> it = map.entrySet().iterator(); it.hasNext(); )
+        {
+            Map.Entry<POI, Integer> entry = it.next();
+
+            if (entry.getValue() < threshold)
+                it.remove();
+        }
     }
 
     @Override
@@ -203,6 +262,12 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
         updateTask.cancel();
         createTask();
         updateTimer.scheduleAtFixedRate(updateTask, millis, millis);
+    }
+
+    @Override
+    public void changeTweetThreshold(String json)
+    {
+        tweetThreshold = new JsonParser().parse(json).getAsJsonObject().get("threshold").getAsInt();
     }
 
 }

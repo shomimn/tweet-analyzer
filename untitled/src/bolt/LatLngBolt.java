@@ -13,6 +13,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import twitter4j.Status;
+import util.POI;
 import util.POIRepository;
 import util.TimeFragmenter;
 
@@ -20,6 +21,7 @@ public class LatLngBolt extends BaseRichBolt
 {
     public static final String ID = "latLngBolt";
     public static final String STREAM = "latLngStream";
+    public static final String TAXI_POI_STREAM = "taxiPoiStream";
 
     private OutputCollector collector;
     private TimeFragmenter fragmenter;
@@ -35,7 +37,8 @@ public class LatLngBolt extends BaseRichBolt
     @Override
     public void declareOutputFields(OutputFieldsDeclarer ofd)
     {
-        ofd.declareStream(STREAM, new Fields("latitude", "longitude"));
+        ofd.declareStream(STREAM, new Fields("latitude", "longitude", "poi"));
+        ofd.declareStream(TAXI_POI_STREAM, new Fields("dropoffLat", "dropoffLon", "dropoffPoi", "dropOffDateTime"));
     }
 
     @Override
@@ -48,7 +51,9 @@ public class LatLngBolt extends BaseRichBolt
     @Override
     public void execute(Tuple tuple)
     {
-        if(tuple.getSourceStreamId() == PrinterBolt.TIME_UNIT_STREAM)
+        String source = tuple.getSourceStreamId();
+
+        if(source.equals(PrinterBolt.TIME_UNIT_STREAM))
         {
             Status status = (Status) tuple.getValue(0);
             double lat = status.getGeoLocation().getLatitude();
@@ -59,21 +64,42 @@ public class LatLngBolt extends BaseRichBolt
                 fragmenter.advanceTimeLine();
 
             int handle = repository.query(lat, lng);
+            POI poi = null;
             if (repository.isValid(handle))
-                System.out.println("POI: " + repository.get(handle).getName());
+            {
+                poi = repository.get(handle);
+                System.out.println("TWEET POI: " + poi.getName());
+            }
 
             collector.emit(STREAM, new Values(status.getGeoLocation().getLatitude(),
-                    status.getGeoLocation().getLongitude()));
+                    status.getGeoLocation().getLongitude(), poi));
         }
-        else if(tuple.getSourceStreamId() == TaxiBolt.TAXI_BOLT_STREAM)
+        else if(source.equals(TaxiBolt.TAXI_BOLT_STREAM))
         {
-            double pickupLat = tuple.getDouble(0);
-            double pickupLon = tuple.getDouble(1);
-            double dropoffLat = tuple.getDouble(2);
-            double dropoffLon = tuple.getDouble(3);
-            DateTime dateTime = (DateTime) tuple.getValue(4);
+//            double pickupLat = tuple.getDouble(0);
+//            double pickupLon = tuple.getDouble(1);
+            double dropoffLat = tuple.getDouble(0);
+            double dropoffLon = tuple.getDouble(1);
+            DateTime dateTime = (DateTime) tuple.getValue(2);
 
-            System.out.println(tuple.toString());
+//            int handle = repository.query(pickupLat, pickupLon);
+//            POI pickupPoi = null;
+//            if(repository.isValid(handle))
+//            {
+//                pickupPoi = repository.get(handle);
+//            }
+
+            int handle = repository.query(dropoffLat, dropoffLon);
+            POI dropoffPoi = null;
+            if(repository.isValid(handle))
+            {
+                dropoffPoi = repository.get(handle);
+                System.out.println("TAXI POI: " + dropoffPoi.getName());
+            }
+
+            collector.emit(TAXI_POI_STREAM, new Values(dropoffLat, dropoffLon, dropoffPoi, dateTime));
+
+//            System.out.println(tuple.toString());
         }
     }
 }
