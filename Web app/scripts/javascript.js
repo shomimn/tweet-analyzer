@@ -23,11 +23,15 @@ var playingAnim = null;
 var test = '';
 var newHeatmap = true;
 var socket = null;
+var markers = [];
 
 google.charts.load("current", {packages:["corechart", "bar"]});
 
 window.onload = function () 
 {
+//    $(".progress-bar").width("0%");
+//    $(".progress-bar").css("width", "0%");
+//    $(".progress-bar")[0].style.width = "100%";
     $("#timeSelect").change(function()
     {
         var timePoint = $(this).val();
@@ -45,6 +49,16 @@ window.onload = function ()
         console.log(newHeatmap);
     });
     
+    $("#showPOICheck").on("ifChecked", function()
+    {
+        updateMarkers(currentLayer, map);
+    });
+    
+    $("#showPOICheck").on("ifUnchecked", function()
+    {
+        updateMarkers(currentLayer, null);
+    });
+    
     socket = new WebSocket("ws://localhost:8888");
             
     socket.onopen = function(event)
@@ -53,9 +67,12 @@ window.onload = function ()
     };
     socket.onmessage = function(msg)
     {
+        animateProgress();
+        
         var data = JSON.parse(msg.data);
         
         addPointsOnMap(data.tweets);
+        addPOIs(data.twitterPois);
         
         $.each(data.places, function(key, value)
         {
@@ -101,6 +118,67 @@ window.onload = function ()
     
     $("#timeSelect").val(CONSTANT.MINUTES);
     charts.current = CONSTANT.MINUTES;
+}
+
+function animateProgress()
+{
+    var progressBar = $(".progress-bar");
+//    
+    progressBar.stop(true, false);
+    progressBar[0].style.width = "0%";
+////    progressBar.animate({width: "-100%"}, 1);
+    setTimeout(function()
+    {
+        progressBar.animate({width: "100%"}, 58000);
+    }, 2000);
+}
+
+function addPOIs(pois)
+{
+    console.log(pois.length);
+    
+    if (currentLayer > 0)
+        updateMarkers(currentLayer - 1);
+    
+    var array = [];
+    for (var i = 0; i < pois.length; ++i)
+    {
+        var infowindow = new google.maps.InfoWindow({
+            content: pois[i].name
+        });
+        
+//        var image = new google.maps.MarkerImage(
+//            "images/twitter-marker2.png",
+//            null,
+//            new google.maps.Point(0, 0),
+//            new google.maps.Point(0, 0),
+//            new google.maps.Size(30, 54)
+//        );
+
+        var latLng = new google.maps.LatLng(pois[i].latitude, pois[i].longitude);
+        var marker = new google.maps.Marker({
+            position: latLng,
+            map: map,
+            title: pois[i].name,
+//            icon: image
+            icon: "images/twitter-marker.png"
+        });
+        
+        marker.addListener('click', function() {
+            infowindow.setContent(this.getTitle());
+            infowindow.open(map, this);
+        });
+        
+        array.push(marker);
+    }
+    
+    markers.push(array);
+}
+
+function updateMarkers(index, map)
+{
+    for (var i = 0; i < markers[index].length; ++i)
+            markers[index][i].setMap(map);
 }
 
 function changeInterval()
@@ -298,9 +376,11 @@ function showLayer()
         $("#layer-id").val(currentLayer);
         return;
     }
+    updateMarkers(currentLayer, null);
     heatmapArray[currentLayer].setMap(null);
     currentLayer = layeriD;
     heatmapArray[currentLayer].setMap(map);
+    updateMarkers(currentLayer, map);
 }
 
 function showPrevious()
@@ -308,9 +388,11 @@ function showPrevious()
     if(currentLayer == 0)
         return;
     var layeriD = $("#layer-id").val();
+    updateMarkers(currentLayer, null);
     heatmapArray[currentLayer].setMap(null);
     currentLayer = parseInt(layeriD)-1;
     heatmapArray[currentLayer].setMap(map);
+    updateMarkers(currentLayer, map);
     $("#layer-id").val(currentLayer);
 }
 
@@ -323,9 +405,11 @@ function showNext()
         return;
     }
     var layeriD = $("#layer-id").val();
+    updateMarkers(currentLayer, null);
     heatmapArray[currentLayer].setMap(null);
     currentLayer = parseInt(layeriD)+1;
     heatmapArray[currentLayer].setMap(map);
+    updateMarkers(currentLayer, map);
     $("#layer-id").val(currentLayer);
 }
 

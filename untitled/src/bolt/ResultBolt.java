@@ -11,7 +11,9 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -24,6 +26,7 @@ import org.apache.storm.shade.org.joda.time.DateTime;
 import server.WebServer;
 import twitter4j.Status;
 import util.OptionsHandler;
+import util.POI;
 
 
 public class ResultBolt extends BaseBasicBolt implements OptionsHandler
@@ -34,6 +37,7 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
 
     public static final String ID = "resultBolt";
     public static final long MINUTE = 60000;
+    public static final int TWEET_THRESHOLD = 1;
 
     public static class SpatialData
     {
@@ -64,12 +68,16 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
     private HashMap<String, Integer> daysMap = new HashMap<>();
     private HashMap<String, Integer> hoursMap = new HashMap<>();
     private HashMap<String, Integer> minsMap = new HashMap<>();
+    private HashMap<POI, Integer> twitterPoiMap = new HashMap<>();
 
     private Type listType = new TypeToken<ArrayList<SpatialData>>(){}.getType();
     private Type mapType = new TypeToken<HashMap<String, Integer>>(){}.getType();
+    private Type poiType = new TypeToken<Set<POI>>(){}.getType();
 
     private Timer updateTimer;
     private TimerTask updateTask;
+
+    private int tweetThreshold = 1;
 
     public ResultBolt()
     {
@@ -84,13 +92,18 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
             {
                 Gson gson = new Gson();
 
+                clearBelowThreshold(twitterPoiMap, tweetThreshold);
+
                 System.out.println(list.size());
-                JsonElement timeUnits = gson.toJsonTree(list, listType);
+//                System.out.println(gson.toJsonTree(twitterPoiMap.keySet(), poiType).toString());
+                JsonElement tweets = gson.toJsonTree(list, listType);
                 JsonElement places = gson.toJsonTree(placesMap, mapType);
                 JsonElement days = gson.toJsonTree(daysMap, mapType);
                 JsonElement hours = gson.toJsonTree(hoursMap, mapType);
                 JsonElement mins = gson.toJsonTree(minsMap, mapType);
                 JsonElement vehicles = gson.toJsonTree(vehicleTweets, listType);
+                JsonElement twitterPois = gson.toJsonTree(twitterPoiMap.keySet(), poiType);
+
 
                 JsonObject timePoints = new JsonObject();
                 timePoints.add("days", days);
@@ -98,10 +111,14 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
                 timePoints.add("mins", mins);
 
                 JsonObject root = new JsonObject();
-                root.add("tweets", timeUnits);
+                root.add("tweets", tweets);
                 root.add("places", places);
                 root.add("timePoints", timePoints);
+
                 root.add("vehiclesPOIS", vehicles);
+
+                root.add("twitterPois", twitterPois);
+
 
                 String json = root.toString();
                 System.out.println(json);
@@ -115,7 +132,10 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
                     daysMap.clear();
                     hoursMap.clear();
                     minsMap.clear();
+
                     vehicleTweets.clear();
+
+                    twitterPoiMap.clear();
                 }
             }
         };
@@ -163,7 +183,15 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
             {
                 double latitude = tuple.getDouble(0);
                 double longitude = tuple.getDouble(1);
+
                 DateTime date = (DateTime)tuple.getValue(2);
+                POI poi = (POI) tuple.getValue(2);
+
+                if (poi != null)
+                {
+                    System.out.println("POI: " + poi.getName());
+                    tryUpdateCount(twitterPoiMap, poi   );
+                }
 
                 list.add(new SpatialData(latitude, longitude, date));
             }
@@ -193,9 +221,7 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
 
                 DateTime refDateMin = date.minusSeconds(TIME_OFFSET);
                 DateTime refDateMax = date.plusSeconds(TIME_OFFSET);
-
-                System.out.println(envelope.toString());
-
+                
                 for (SpatialData data: list)
                 {
                     if(envelope.contains(new Point(data.latitude,data.longitude)) && refDateMin.isBefore(data.date) && refDateMax.isAfter(data.date))
@@ -226,7 +252,7 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
     }
 
 
-    private void tryUpdateCount(HashMap<String, Integer> map, String key)
+    private<T> void tryUpdateCount(HashMap<T, Integer> map, T key)
     {
         if (!map.containsKey(key))
             map.put(key, 0);
@@ -234,11 +260,22 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
         updateCount(map, key);
     }
 
-    private void updateCount(HashMap<String, Integer> map, String key)
+    private<T> void updateCount(HashMap<T, Integer> map, T key)
     {
         Integer value = map.get(key);
         ++value;
         map.put(key, value);
+    }
+
+    private void clearBelowThreshold(HashMap<POI, Integer> map, int threshold)
+    {
+        for (Iterator<Map.Entry<POI, Integer>> it = map.entrySet().iterator(); it.hasNext(); )
+        {
+            Map.Entry<POI, Integer> entry = it.next();
+
+            if (entry.getValue() < threshold)
+                it.remove();
+        }
     }
 
     @Override
@@ -249,6 +286,12 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
         updateTask.cancel();
         createTask();
         updateTimer.scheduleAtFixedRate(updateTask, millis, millis);
+    }
+
+    @Override
+    public void changeTweetThreshold(String json)
+    {
+        tweetThreshold = new JsonParser().parse(json).getAsJsonObject().get("threshold").getAsInt();
     }
 
 }

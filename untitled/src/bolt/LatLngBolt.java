@@ -13,6 +13,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 import twitter4j.Status;
+import util.POI;
 import util.POIRepository;
 import util.TimeFragmenter;
 
@@ -35,7 +36,7 @@ public class LatLngBolt extends BaseRichBolt
     @Override
     public void declareOutputFields(OutputFieldsDeclarer ofd)
     {
-        ofd.declareStream(STREAM, new Fields("latitude", "longitude","date"));
+        ofd.declareStream(STREAM, new Fields("latitude", "longitude","date","poi"));
     }
 
     @Override
@@ -57,10 +58,15 @@ public class LatLngBolt extends BaseRichBolt
             fragmenter.advanceTimeLine();
 
         int handle = repository.query(lat, lng);
+        POI poi = null;
         if (repository.isValid(handle))
-            System.out.println("POI: " + repository.get(handle).getName());
+        {
+            poi = repository.get(handle);
+            System.out.println("POI: " + poi.getName());
+        }
 
         collector.emit(STREAM, new Values(status.getGeoLocation().getLatitude(),
-                status.getGeoLocation().getLongitude(),new DateTime(status.getCreatedAt())));
+
+                status.getGeoLocation().getLongitude(),new DateTime(status.getCreatedAt()), poi));
     }
 }
