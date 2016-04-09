@@ -51,6 +51,7 @@
                             <div class="checkbox"><label> <input type="checkbox" checked class="i-checks" id="showPOICheck"> Show POIs </label></div>
                             </div>
                             <div class="col-md-4">
+                                <div class="row">
                                 <div class="col-md-2 center-text">
                                     Update interval
                                 </div>
@@ -59,6 +60,18 @@
                                 </div>
                                 <div class="col-md-6">
                                     <button class="btn btn-primary" onclick="changeInterval()">Change interval</button>
+                                </div>
+                                    </div>
+                                <div class="row">
+                                <div class="col-md-2 center-text">
+                                    Tweet threshold
+                                </div>
+                                <div class="col-md-4">
+                                    <input class="form-control" type="number" min="0" id="tweetThreshold"/>
+                                </div>
+                                <div class="col-md-6">
+                                    <button class="btn btn-primary" onclick="changeTweetThreshold()">Change threshold</button>
+                                </div>
                                 </div>
                             </div>
                         </div>

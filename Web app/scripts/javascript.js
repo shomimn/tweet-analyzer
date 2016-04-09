@@ -8,7 +8,14 @@ var CONSTANT =
 
 var REQUEST =
 {
-    UPDATE_INTERVAL: "changeUpdateInterval"
+    UPDATE_INTERVAL: "changeUpdateInterval",
+    TWEET_THRESHOLD: "changeTweetThreshold"
+};
+
+var RESPONSE = 
+{
+    INIT: "initOptions",
+    UPDATE: "updateUi"
 };
 
 var heatmap;
@@ -138,7 +145,7 @@ function addPOIs(pois)
     console.log(pois.length);
     
     if (currentLayer > 0)
-        updateMarkers(currentLayer - 1);
+        updateMarkers(currentLayer - 1, null);
     
     var array = [];
     for (var i = 0; i < pois.length; ++i)
@@ -186,6 +193,13 @@ function changeInterval()
     var interval = parseInt($("#updateInterval").val());
     
     socket.send(JSON.stringify({ request: REQUEST.UPDATE_INTERVAL, data: { interval: interval } }));
+}
+
+function changeTweetThreshold()
+{
+    var threshold = parseInt($("#tweetThreshold").val());
+    
+    socket.send(JSON.stringify({ request: REQUEST.TWEET_THRESHOLD, data: { threshold: threshold} }));
 }
 
 function createDataTables()

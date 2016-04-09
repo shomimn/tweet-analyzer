@@ -1,7 +1,9 @@
 import java.util.Map;
+import java.util.UUID;
 
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
+import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.IRichBolt;
@@ -14,7 +16,13 @@ import bolt.PrinterBolt;
 import bolt.ResultBolt;
 import bolt.TimePointBolt;
 import bolt.LatLngBolt;
+import scheme.TaxiScheme;
 import spout.TwitterSpout;
+import storm.kafka.BrokerHosts;
+import storm.kafka.KafkaSpout;
+import storm.kafka.KeyValueSchemeAsMultiScheme;
+import storm.kafka.SpoutConfig;
+import storm.kafka.ZkHosts;
 import util.AppConfig;
 import util.TimeFragmenter;
 
@@ -57,7 +65,7 @@ public class Main
 {
     public static final int DURATION = 300000;
     public static final int TIME_UNITS = 5;
-    public static final String TAXI_TOPIC = "taxi-topic";
+    public static final String TAXI_TOPIC = "vehicle-topic";
 
     public static void main(String[] args) throws Exception
     {
@@ -70,7 +78,7 @@ public class Main
 
 //        BrokerHosts hosts = new ZkHosts("localhost:2181");
 //        SpoutConfig spoutConfig = new SpoutConfig(hosts, TAXI_TOPIC, "/" + TAXI_TOPIC, UUID.randomUUID().toString());
-//        spoutConfig.scheme = new SchemeAsMultiScheme(new TaxiScheme());
+//        spoutConfig.scheme = new KeyValueSchemeAsMultiScheme(new TaxiScheme());
 //        KafkaSpout kafkaSpout = new KafkaSpout(spoutConfig);
 //
 //        builder.setSpout("kafkaSpout", kafkaSpout);

@@ -6,6 +6,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
+import org.apache.storm.shade.org.joda.time.DateTime;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Date;
@@ -241,6 +243,7 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
     public void changeTweetThreshold(String json)
     {
         tweetThreshold = new JsonParser().parse(json).getAsJsonObject().get("threshold").getAsInt();
+        System.out.println("tweet threshold: " + tweetThreshold);
     }
 
 }
