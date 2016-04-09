@@ -30,7 +30,7 @@ var playingAnim = null;
 var test = '';
 var newHeatmap = true;
 var socket = null;
-var markers = [];
+var markers = {};
 
 google.charts.load("current", {packages:["corechart", "bar"]});
 
@@ -79,7 +79,11 @@ window.onload = function ()
         var data = JSON.parse(msg.data);
         
         addPointsOnMap(data.tweets);
-        addPOIs(data.twitterPois);
+        addPOIs(data.twitterPois, "twitter");
+        addPOIs(data.taxiPois, "taxi");
+        addPOIs(data.taxiTwitterPois, "taxiTwitter");
+        
+        updateCount("total-taxis", data.taxiTotal);
         
         $.each(data.places, function(key, value)
         {
@@ -140,7 +144,8 @@ function animateProgress()
     }, 2000);
 }
 
-function addPOIs(pois)
+
+function addPOIs(pois, poiType)
 {
     console.log(pois.length);
     
@@ -168,7 +173,7 @@ function addPOIs(pois)
             map: map,
             title: pois[i].name,
 //            icon: image
-            icon: "images/twitter-marker.png"
+            icon: "images/"+poiType+"-marker.png"
         });
         
         marker.addListener('click', function() {
@@ -179,13 +184,20 @@ function addPOIs(pois)
         array.push(marker);
     }
     
-    markers.push(array);
+    (markers[poiType] = markers[poiType] || []).push(array)
+//    markers[poiType].push(array);
 }
+
 
 function updateMarkers(index, map)
 {
-    for (var i = 0; i < markers[index].length; ++i)
-            markers[index][i].setMap(map);
+    $.each(markers, function(key, array)
+    {
+        for (var i = 0; i < array[index].length; ++i)
+            array[index][i].setMap(map);
+    });
+//    for (var i = 0; i < markers[index].length; ++i)
+//            markers[index][i].setMap(map);
 }
 
 function changeInterval()
