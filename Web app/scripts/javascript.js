@@ -9,7 +9,8 @@ var CONSTANT =
 var REQUEST =
 {
     UPDATE_INTERVAL: "changeUpdateInterval",
-    TWEET_THRESHOLD: "changeTweetThreshold"
+    TWEET_THRESHOLD: "changeTweetThreshold",
+    TAXI_THRESHOLD: "changeTaxiThreshold"
 };
 
 var RESPONSE = 
@@ -31,6 +32,7 @@ var test = '';
 var newHeatmap = true;
 var socket = null;
 var markers = {};
+var options = {};
 
 google.charts.load("current", {packages:["corechart", "bar"]});
 
@@ -74,36 +76,9 @@ window.onload = function ()
     };
     socket.onmessage = function(msg)
     {
-        animateProgress();
-        
         var data = JSON.parse(msg.data);
         
-        addPointsOnMap(data.tweets);
-        addPOIs(data.twitterPois, "twitter");
-        addPOIs(data.taxiPois, "taxi");
-        addPOIs(data.taxiTwitterPois, "taxiTwitter");
-        
-        updateCount("total-taxis", data.taxiTotal);
-        
-        $.each(data.places, function(key, value)
-        {
-            updateChart(CONSTANT.PLACES, key, value);
-        });
-        
-        $.each(data.timePoints.days, function(key, value)
-        {
-            updateChart(CONSTANT.DAYS, key, value);
-        });
-        
-        $.each(data.timePoints.hours, function(key, value)
-        {
-            updateChart(CONSTANT.HOURS, key, value);
-        });
-        
-        $.each(data.timePoints.mins, function(key, value)
-        {
-            updateChart(CONSTANT.MINUTES, key, value);
-        });
+        window[data.response](data.data);
     }
     console.log("ovde radi");
     
@@ -131,8 +106,55 @@ window.onload = function ()
     charts.current = CONSTANT.MINUTES;
 }
 
-function animateProgress()
+function initOptions(data)
 {
+    options = data;
+    
+    animateProgress(options.timeLeft);
+    
+    $("#updateInterval").val(options.interval);
+    $("#tweetThreshold").val(options.tweetThreshold);
+    $("#taxiThreshold").val(options.taxiThreshold);
+}
+
+function updateUi(data)
+{
+    animateProgress(options.interval);
+
+    addPointsOnMap(data.tweets);
+    addPOIs(data.twitterPois, "twitter");
+    addPOIs(data.taxiPois, "taxi");
+    addPOIs(data.taxiTwitterPois, "taxiTwitter");
+    addPOIs(data.vehiclesPOIS, "vehicle");
+    console.log(data.taxiTwitterPois.length);
+
+    updateCount("total-taxis", data.taxiTotal);
+    updateCount("total-vehicles", data.vehicleTotal);
+
+    $.each(data.places, function(key, value)
+    {
+        updateChart(CONSTANT.PLACES, key, value);
+    });
+
+    $.each(data.timePoints.days, function(key, value)
+    {
+        updateChart(CONSTANT.DAYS, key, value);
+    });
+
+    $.each(data.timePoints.hours, function(key, value)
+    {
+        updateChart(CONSTANT.HOURS, key, value);
+    });
+
+    $.each(data.timePoints.mins, function(key, value)
+    {
+        updateChart(CONSTANT.MINUTES, key, value);
+    });
+}
+
+function animateProgress(millis)
+{
+    var offset = 2000;
     var progressBar = $(".progress-bar");
 //    
     progressBar.stop(true, false);
@@ -140,14 +162,14 @@ function animateProgress()
 ////    progressBar.animate({width: "-100%"}, 1);
     setTimeout(function()
     {
-        progressBar.animate({width: "100%"}, 58000);
-    }, 2000);
+        progressBar.animate({width: "100%"}, millis - offset);
+    }, offset);
 }
 
 
 function addPOIs(pois, poiType)
 {
-    console.log(pois.length);
+//    console.log(pois.length);
     
     if (currentLayer > 0)
         updateMarkers(currentLayer - 1, null);
@@ -158,21 +180,12 @@ function addPOIs(pois, poiType)
         var infowindow = new google.maps.InfoWindow({
             content: pois[i].name
         });
-        
-//        var image = new google.maps.MarkerImage(
-//            "images/twitter-marker2.png",
-//            null,
-//            new google.maps.Point(0, 0),
-//            new google.maps.Point(0, 0),
-//            new google.maps.Size(30, 54)
-//        );
 
         var latLng = new google.maps.LatLng(pois[i].latitude, pois[i].longitude);
         var marker = new google.maps.Marker({
             position: latLng,
             map: map,
             title: pois[i].name,
-//            icon: image
             icon: "images/"+poiType+"-marker.png"
         });
         
@@ -185,7 +198,6 @@ function addPOIs(pois, poiType)
     }
     
     (markers[poiType] = markers[poiType] || []).push(array)
-//    markers[poiType].push(array);
 }
 
 
@@ -196,22 +208,28 @@ function updateMarkers(index, map)
         for (var i = 0; i < array[index].length; ++i)
             array[index][i].setMap(map);
     });
-//    for (var i = 0; i < markers[index].length; ++i)
-//            markers[index][i].setMap(map);
 }
 
 function changeInterval()
 {
-    var interval = parseInt($("#updateInterval").val());
+    options.interval = parseInt($("#updateInterval").val());
     
-    socket.send(JSON.stringify({ request: REQUEST.UPDATE_INTERVAL, data: { interval: interval } }));
+    socket.send(JSON.stringify({ request: REQUEST.UPDATE_INTERVAL, data: { interval: options.interval } }));
+    animateProgress(options.interval);
 }
 
 function changeTweetThreshold()
 {
     var threshold = parseInt($("#tweetThreshold").val());
     
-    socket.send(JSON.stringify({ request: REQUEST.TWEET_THRESHOLD, data: { threshold: threshold} }));
+    socket.send(JSON.stringify({ request: REQUEST.TWEET_THRESHOLD, data: { threshold: threshold } }));
+}
+
+function changeTaxiThreshold()
+{
+    var threshold = parseInt($("#taxiThreshold").val());
+    
+    socket.send(JSON.stringify({ request: REQUEST.TAXI_THRESHOLD, data: { threshold: threshold } }));
 }
 
 function createDataTables()

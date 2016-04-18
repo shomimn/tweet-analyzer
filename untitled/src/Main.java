@@ -1,9 +1,9 @@
+import java.net.UnknownHostException;
 import java.util.Map;
 import java.util.UUID;
 
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
-import backtype.storm.spout.SchemeAsMultiScheme;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.IRichBolt;
@@ -17,6 +17,7 @@ import bolt.ResultBolt;
 import bolt.TimePointBolt;
 import bolt.LatLngBolt;
 import scheme.TaxiScheme;
+import server.WebServer;
 import spout.TwitterSpout;
 import storm.kafka.BrokerHosts;
 import storm.kafka.KafkaSpout;
@@ -24,10 +25,7 @@ import storm.kafka.KeyValueSchemeAsMultiScheme;
 import storm.kafka.SpoutConfig;
 import storm.kafka.ZkHosts;
 import bolt.*;
-import scheme.TaxiScheme;
 import scheme.VehicleScheme;
-import spout.TwitterSpout;
-import storm.kafka.*;
 import util.AppConfig;
 import util.TimeFragmenter;
 
@@ -110,7 +108,7 @@ public class Main
                 .shuffleGrouping(TwitterSpout.ID);
 
         builder.setBolt(LatLngBolt.ID, new LatLngBolt(fragmenter, appConfig.poiPath))
-                .shuffleGrouping(PrinterBolt.ID, PrinterBolt.TIME_UNIT_STREAM)
+                .shuffleGrouping(PrinterBolt.ID, PrinterBolt.LAT_LNG_STREAM)
                 .shuffleGrouping(TaxiBolt.ID, TaxiBolt.TAXI_BOLT_STREAM);
 
         builder.setBolt(PlaceBolt.ID, new PlaceBolt())
@@ -118,7 +116,6 @@ public class Main
 
         builder.setBolt(TimePointBolt.ID, new TimePointBolt(fragmenter))
                 .shuffleGrouping(PrinterBolt.ID, PrinterBolt.TIME_POINT_STREAM);
-
 
         builder.setBolt(ResultBolt.ID, new ResultBolt(), 1)
                 .shuffleGrouping(LatLngBolt.ID, LatLngBolt.STREAM)

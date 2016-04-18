@@ -11,11 +11,18 @@ import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.security.cert.PKIXRevocationChecker;
 
 import util.OptionsHandler;
 
 public class WebServer extends WebSocketServer
 {
+    public class Response
+    {
+        public static final String INIT = "initOptions";
+        public static final String UPDATE = "updateUi";
+    }
+
     private OptionsHandler optionsHandler;
 
     public WebServer(OptionsHandler handler, int port) throws UnknownHostException
@@ -30,11 +37,23 @@ public class WebServer extends WebSocketServer
         optionsHandler = handler;
     }
 
+    public WebServer(int port) throws UnknownHostException
+    {
+        super(new InetSocketAddress(port));
+    }
+
 
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake)
     {
         System.out.println("New connection: " + webSocket.getRemoteSocketAddress().getAddress().getHostAddress());
+
+        JsonObject options = optionsHandler.getOptions();
+        JsonObject root = new JsonObject();
+        root.addProperty("response", Response.INIT);
+        root.add("data", options);
+
+        webSocket.send(root.toString());
     }
 
     @Override
@@ -66,9 +85,20 @@ public class WebServer extends WebSocketServer
 
     }
 
-    public void sendToAll(String msg)
+    public void sendToAll(JsonObject data)
     {
+        JsonObject root = new JsonObject();
+        root.addProperty("response", Response.UPDATE);
+        root.add("data", data);
+
+        String msg = root.toString();
+
         for (WebSocket s : connections())
             s.send(msg);
+    }
+
+    public void setOptionsHandler(OptionsHandler handler)
+    {
+        optionsHandler = handler;
     }
 }

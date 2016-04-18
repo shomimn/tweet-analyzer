@@ -39,8 +39,9 @@ public class TaxiBolt implements IRichBolt {
         if(!keySet.contains(key))
         {
             keySet.add(key);
-            collector.emit(TAXI_BOLT_STREAM, new Values(tuple.getDouble(3), tuple.getDouble(4), tuple.getValue(5)));
-
+//            collector.emit(TAXI_BOLT_STREAM, new Values(tuple.getDouble(3), tuple.getDouble(4), tuple.getValue(5)));
+            collector.emit(TAXI_BOLT_STREAM, new Values(tuple.getDouble(1), tuple.getDouble(2),
+                    tuple.getDouble(3), tuple.getDouble(4), tuple.getValue(5)));
         }
     }
 
@@ -53,7 +54,8 @@ public class TaxiBolt implements IRichBolt {
     @Override
     public void declareOutputFields(OutputFieldsDeclarer ofd)
     {
-        ofd.declareStream(TAXI_BOLT_STREAM, new Fields("dropoffLat", "dropoffLon", "dropOffDateTime"));
+//        ofd.declareStream(TAXI_BOLT_STREAM, new Fields("dropoffLat", "dropoffLon", "dropOffDateTime"));
+        ofd.declareStream(TAXI_BOLT_STREAM, new Fields("pickupLat", "pickupLon", "dropoffLat", "dropoffLon", "dropOffDateTime"));
     }
 
     @Override

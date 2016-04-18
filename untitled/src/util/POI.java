@@ -66,4 +66,10 @@ public class POI implements Serializable
     {
         return name.hashCode() * (int) (latitude * longitude);
     }
+
+    @Override
+    public String toString()
+    {
+        return "( " + name + " " + latitude + " " + longitude + " )";
+    }
 }

@@ -18,29 +18,31 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Tuple;
 import org.apache.storm.shade.org.joda.time.DateTime;
+import org.apache.storm.shade.org.joda.time.Seconds;
+
 import server.WebServer;
 import twitter4j.Status;
 import util.OptionsHandler;
 import util.POI;
+import util.ServerSingleton;
 
 
 public class ResultBolt extends BaseBasicBolt implements OptionsHandler
 {
     private static final int SPATIAL_REF_WKID = 4326;
-    private static final double BUFFER_DISTANCE = 0.00055;
-    private static final int TIME_OFFSET = 240;
+    private static final double BUFFER_DISTANCE = 0.00155;
+    private static final int TIME_OFFSET = 10;
 
     public static final String ID = "resultBolt";
     public static final long MINUTE = 60000;
     public static final int TWEET_THRESHOLD = 1;
     public static final int TAXI_THRESHOLD = 1;
-    public int taxiCounter = 0;
 
     public static class SpatialData
     {
         public double latitude;
         public double longitude;
-        public DateTime date;
+        public transient DateTime date;
 
         public SpatialData(double lat, double lng, DateTime d)
         {
@@ -75,8 +77,14 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
     private Timer updateTimer;
     private TimerTask updateTask;
 
-    private int tweetThreshold = 1;
-    private int taxiThreshold = 1;
+    public int tweetThreshold = 1;
+    public int taxiThreshold = 1;
+
+    public long interval = 1 * MINUTE;
+    private int taxiCounter = 0;
+    private int vehicleCounter = 0;
+
+    public DateTime lastUpdate;
 
     public ResultBolt()
     {
@@ -94,6 +102,48 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
                 clearBelowThreshold(twitterPoiMap, tweetThreshold);
                 clearBelowThreshold(taxiPoiMap, taxiThreshold);
 
+                SpatialReference ref = SpatialReference.create(SPATIAL_REF_WKID);
+                Envelope envelope = new Envelope();
+
+                for (Iterator<SpatialData> it = vehicleTweets.iterator(); it.hasNext(); )
+                {
+                    SpatialData vehicle = it.next();
+                    Point p = new Point(vehicle.latitude, vehicle.longitude);
+                    Geometry geom = OperatorBuffer.local().execute(p, ref, BUFFER_DISTANCE, null);
+                    geom.queryEnvelope(envelope);
+
+                    DateTime refDateMin = vehicle.date.minusSeconds(TIME_OFFSET);
+                    DateTime refDateMax = vehicle.date.plusSeconds(TIME_OFFSET);
+
+                    boolean found = false;
+
+                    for (SpatialData data : list)
+                    {
+//                    if(envelope.contains(new Point(data.latitude,data.longitude)) && refDateMin.isBefore(data.date) && refDateMax.isAfter(data.date))
+//                    {
+//                        vehicleTweets.add(new SpatialData(latitude,longitude));
+//                        System.out.println("TWEET FROM VEHICLE: LAT: " + latitude + " LON: " + longitude);
+//                    }
+                        if (envelope.contains(new Point(data.latitude, data.longitude)) &&
+                                refDateMin.isBefore(data.date) && refDateMax.isAfter(data.date))
+                        {
+                            found = true;
+                            System.out.println("TWEET FROM VEHICLE: LAT: " + vehicle.latitude + " LON: " + vehicle.longitude);
+                        }
+                    }
+
+                    if (!found)
+                        it.remove();
+                }
+
+//                int i = 0;
+//                for (Map.Entry<POI, Integer> entry : taxiPoiMap.entrySet())
+//                {
+//                    if (i == 2)
+//                        break;
+//                    twitterPoiMap.put(entry.getKey(), entry.getValue());
+//                    ++i;
+//                }
 
                 Set<POI> intersection = new HashSet<>(twitterPoiMap.keySet());
                 intersection.retainAll(taxiPoiMap.keySet());
@@ -102,7 +152,7 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
 
 
                 System.out.println(list.size());
-                System.out.println(gson.toJsonTree(taxiPoiMap.keySet(), poiType).toString());
+//                System.out.println(gson.toJsonTree(taxiPoiMap.keySet(), poiType).toString());
                 JsonElement tweets = gson.toJsonTree(list, listType);
                 JsonElement places = gson.toJsonTree(placesMap, mapType);
                 JsonElement days = gson.toJsonTree(daysMap, mapType);
@@ -128,14 +178,15 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
                 root.add("taxiPois", taxiPois);
                 root.add("taxiTwitterPois", taxiTwitterPois);
                 root.addProperty("taxiTotal", taxiCounter);
-
+                root.addProperty("vehicleTotal", vehicleCounter);
 
 
 
                 String json = root.toString();
                 System.out.println(json);
 
-                server.sendToAll(json);
+                ServerSingleton.server.sendToAll(root);
+                lastUpdate = DateTime.now();
 
                 synchronized (this)
                 {
@@ -150,6 +201,7 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
                     twitterPoiMap.clear();
                     taxiPoiMap.clear();
                     taxiCounter = 0;
+                    vehicleCounter = 0;
                 }
             }
         };
@@ -165,19 +217,22 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
     {
         super.prepare(stormConf, context);
 
-        try
-        {
-            server = new WebServer(this, 8888);
-            server.start();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+//        try
+//        {
+//            server = new WebServer(this, 8888);
+//            server.start();
+//        }
+//        catch (Exception e)
+//        {
+//            e.printStackTrace();
+//        }
+
+        ServerSingleton.server.setOptionsHandler(this);
 
         updateTimer = new Timer();
         createTask();
-        scheduleTask(1 * MINUTE);
+        scheduleTask(interval);
+        lastUpdate = DateTime.now();
     }
 
     @Override
@@ -213,45 +268,29 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
             {
 //                double latitude = tuple.getDouble(0);
 //                double longitude = tuple.getDouble(1);
-                taxiCounter++;
+                ++taxiCounter;
                 POI poi = (POI) tuple.getValue(2);
-
+                POI poi2 = (POI) tuple.getValue(3);
 //                DateTime dateTime = (DateTime) tuple.getValue(3);
 
                 if(poi != null)
                     tryUpdateCount(taxiPoiMap, poi);
+
+                if (poi2 != null)
+                    tryUpdateCount(taxiPoiMap, poi2);
             }
 
             else if(source.equals(VehicleBolt.STREAM))
             {
+                ++vehicleCounter;
+
                 long id = tuple.getLong(0);
                 long timestamp = tuple.getLong(1);
                 double latitude = tuple.getDouble(2);
                 double longitude = tuple.getDouble(3);
                 DateTime date = (DateTime)tuple.getValue(4);
 
-                SpatialReference ref = SpatialReference.create(SPATIAL_REF_WKID);
-                Envelope envelope = new Envelope();
-                Point p = new Point(latitude, longitude);
-                Geometry geom = OperatorBuffer.local().execute(p, ref, BUFFER_DISTANCE, null);
-                geom.queryEnvelope(envelope);
-
-                DateTime refDateMin = date.minusSeconds(TIME_OFFSET);
-                DateTime refDateMax = date.plusSeconds(TIME_OFFSET);
-
-                for (SpatialData data: list)
-                {
-                    if(envelope.contains(new Point(data.latitude,data.longitude)) && refDateMin.isBefore(data.date) && refDateMax.isAfter(data.date))
-                    {
-                        vehicleTweets.add(new SpatialData(latitude,longitude));
-                        System.out.println("TWEET FROM VEHICLE: LAT: " + latitude + " LON: " + longitude);
-                    }
-//                    if(envelope.contains(new Point(data.latitude,data.longitude)))
-//                    {
-//                        vehicleTweets.add(new SpatialData(latitude,longitude));
-//                        System.out.println("TWEET FROM VEHICLE: LAT: " + latitude + " LON: " + longitude);
-//                    }
-                }
+                vehicleTweets.add(new SpatialData(latitude, longitude, date));
             }
             else
             {
@@ -308,11 +347,11 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
     @Override
     public void changeUpdateInterval(String json)
     {
-        long millis = new JsonParser().parse(json).getAsJsonObject().get("interval").getAsLong();
+        interval = new JsonParser().parse(json).getAsJsonObject().get("interval").getAsLong();
 
         updateTask.cancel();
         createTask();
-        updateTimer.scheduleAtFixedRate(updateTask, millis, millis);
+        updateTimer.scheduleAtFixedRate(updateTask, interval, interval);
     }
 
     @Override
@@ -320,6 +359,36 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
     {
         tweetThreshold = new JsonParser().parse(json).getAsJsonObject().get("threshold").getAsInt();
         System.out.println("tweet threshold: " + tweetThreshold);
+    }
+
+    @Override
+    public void changeTaxiThreshold(String json)
+    {
+        taxiThreshold = new JsonParser().parse(json).getAsJsonObject().get("threshold").getAsInt();
+        System.out.println("taxi threshold: " + taxiThreshold);
+    }
+
+    @Override
+    public JsonObject getOptions()
+    {
+        JsonObject options = new JsonObject();
+        options.addProperty("taxiThreshold", taxiThreshold);
+        options.addProperty("tweetThreshold", tweetThreshold);
+        options.addProperty("interval", interval);
+        options.addProperty("timeLeft", timeLeft());
+
+        return options;
+    }
+
+    private long timeLeft()
+    {
+        DateTime now = DateTime.now();
+        System.out.println(now.toString());
+        DateTime then = lastUpdate.plusSeconds((int) interval / 1000);
+        System.out.println(then.toString());
+        System.out.println("diff: " + Seconds.secondsBetween(now, then).getSeconds() * 1000);
+
+        return Seconds.secondsBetween(now, then).getSeconds() * 1000;
     }
 
 }

@@ -1,5 +1,0 @@
-consumerKey = 98UhTokVyTsaxzwIcUzDB2tya
-consumerSecret = hYxMJG1mrHMm5jHDYN0Q0M9ya5bivWWQinA0xUlQ3J8oJrIEi3
-accessToken = 351669146-IxGWkocjPL8lGF5yIWHpDpS3HaCdrJgODpAfWiKG
-accessTokenSecret = FbfQeldZRDVdVSZ0aDOwRVJhoPrLD1zEduUYz6J5qI8N6
-poiPath = /home/tweet-analyzer/ny.csv

@@ -38,7 +38,8 @@ public class LatLngBolt extends BaseRichBolt
     public void declareOutputFields(OutputFieldsDeclarer ofd)
     {
         ofd.declareStream(STREAM, new Fields("latitude", "longitude","date","poi"));
-        ofd.declareStream(TAXI_POI_STREAM, new Fields("dropoffLat", "dropoffLon", "dropoffPoi", "dropOffDateTime"));
+//        ofd.declareStream(TAXI_POI_STREAM, new Fields("dropoffLat", "dropoffLon", "dropoffPoi", "dropOffDateTime"));
+        ofd.declareStream(TAXI_POI_STREAM, new Fields("dropoffLat", "dropoffLon", "pickupPoi", "dropoffPoi", "dropOffDateTime"));
     }
 
     @Override
@@ -53,7 +54,7 @@ public class LatLngBolt extends BaseRichBolt
     {
         String source = tuple.getSourceStreamId();
 
-        if(source.equals(PrinterBolt.TIME_UNIT_STREAM))
+        if(source.equals(PrinterBolt.LAT_LNG_STREAM))
         {
             Status status = (Status) tuple.getValue(0);
             double lat = status.getGeoLocation().getLatitude();
@@ -76,11 +77,11 @@ public class LatLngBolt extends BaseRichBolt
         }
         else if(source.equals(TaxiBolt.TAXI_BOLT_STREAM))
         {
-//            double pickupLat = tuple.getDouble(0);
-//            double pickupLon = tuple.getDouble(1);
-            double dropoffLat = tuple.getDouble(0);
-            double dropoffLon = tuple.getDouble(1);
-            DateTime dateTime = (DateTime) tuple.getValue(2);
+            double pickupLat = tuple.getDouble(0);
+            double pickupLon = tuple.getDouble(1);
+            double dropoffLat = tuple.getDouble(2);
+            double dropoffLon = tuple.getDouble(3);
+            DateTime dateTime = (DateTime) tuple.getValue(4);
 
             int handle = repository.query(dropoffLat, dropoffLon);
             POI dropoffPoi = null;
@@ -90,7 +91,15 @@ public class LatLngBolt extends BaseRichBolt
                 System.out.println("TAXI POI: " + dropoffPoi.getName());
             }
 
-            collector.emit(TAXI_POI_STREAM, new Values(dropoffLat, dropoffLon, dropoffPoi, dateTime));
+            handle = repository.query(pickupLat, pickupLon);
+            POI pickupPoi = null;
+            if (repository.isValid(handle))
+            {
+                pickupPoi = repository.get(handle);
+                System.out.println("TAXI POI: " + pickupPoi.getName());
+            }
+
+            collector.emit(TAXI_POI_STREAM, new Values(dropoffLat, dropoffLon, pickupPoi, dropoffPoi, dateTime));
 
 //            System.out.println(tuple.toString());
         }

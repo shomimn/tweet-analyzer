@@ -16,7 +16,7 @@ public class PrinterBolt extends BaseRichBolt
     public static final String ID = "printerBolt";
     public static final String PLACE_STREAM = "placeStream";
     public static final String TIME_POINT_STREAM = "timePointStream";
-    public static final String TIME_UNIT_STREAM = "timeUnitStream";
+    public static final String LAT_LNG_STREAM = "timeUnitStream";
 
     private OutputCollector collector;
 
@@ -37,7 +37,7 @@ public class PrinterBolt extends BaseRichBolt
                     + status.getGeoLocation().getLongitude() + ") - " + status.getPlace().getName() + " - "  + status.getText());
 
             collector.emit(TIME_POINT_STREAM, new Values(status));
-            collector.emit(TIME_UNIT_STREAM, new Values(status));
+            collector.emit(LAT_LNG_STREAM, new Values(status));
             collector.emit(PLACE_STREAM, new Values(status));
         }
     }
@@ -47,7 +47,7 @@ public class PrinterBolt extends BaseRichBolt
     public void declareOutputFields(OutputFieldsDeclarer ofd)
     {
         ofd.declareStream(TIME_POINT_STREAM, new Fields("tweet"));
-        ofd.declareStream(TIME_UNIT_STREAM, new Fields("tweet"));
+        ofd.declareStream(LAT_LNG_STREAM, new Fields("tweet"));
         ofd.declareStream(PLACE_STREAM, new Fields("tweet"));
     }
 

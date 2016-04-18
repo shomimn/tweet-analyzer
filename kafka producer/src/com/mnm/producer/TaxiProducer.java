@@ -18,8 +18,9 @@ import java.util.Properties;
 public class TaxiProducer
 {
     public static final String TAXI_TOPIC = "taxi-topic";
-    public static final String FILE_PATH = "/home/nimbus/git projects/NYC taxi/trip_data_1.csv";
+    public static final String FILE_PATH = "/home/milos/IdeaProjects/tweet-analyzer/untitled/trip_data_1.csv";
     public Producer<String, Taxi> producer;
+    String[] values;
 
     public TaxiProducer()
     {
@@ -49,6 +50,10 @@ public class TaxiProducer
             while ((line = bufferedReader.readLine()) != null)
             {
                 String[] values = line.split(",");
+
+                if (values.length < 13)
+                    continue;
+
                 Taxi taxi = new Taxi(Double.parseDouble(values[11]), Double.parseDouble(values[10]), Double.parseDouble(values[13]), Double.parseDouble(values[12]));
 
                 //u fajlu postoje redovi gde su sve tacke 0, pa sam ih izbacio
@@ -60,11 +65,7 @@ public class TaxiProducer
             }
 
         }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-        catch (IOException e)
+        catch (Exception e)
         {
             e.printStackTrace();
         }
@@ -80,7 +81,7 @@ public class TaxiProducer
                     e.printStackTrace();
                 }
             producer.close();
-
+            System.out.println("taxi producer closed");
         }
     }
 }

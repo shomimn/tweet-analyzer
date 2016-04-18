@@ -59,11 +59,7 @@ public class VehicleProducer
                     }
 
                 }
-                catch (FileNotFoundException e)
-                {
-                    e.printStackTrace();
-                }
-                catch (IOException e)
+                catch (Exception e)
                 {
                     e.printStackTrace();
                 }
@@ -79,6 +75,7 @@ public class VehicleProducer
                             e.printStackTrace();
                         }
                     producer.close();
+                    System.out.println("vehicle producer closed");
                 }
 
             }
