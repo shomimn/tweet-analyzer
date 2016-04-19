@@ -1,8 +1,11 @@
 package spout;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadLocalRandom;
 
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
@@ -13,6 +16,8 @@ import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 import twitter4j.FilterQuery;
 import twitter4j.GeoLocation;
+import twitter4j.Place;
+import twitter4j.RateLimitStatus;
 import twitter4j.StallWarning;
 import twitter4j.Status;
 import twitter4j.StatusDeletionNotice;
@@ -34,6 +39,11 @@ public class TwitterSpout extends BaseRichSpout
     String accessToken;
     String accessTokenSecret;
     String[] keyWords;
+
+    double minLat = 40.576413;
+    double minLng = -74.170074;
+    double maxLat = 41.081421;
+    double maxLng = -73.78418;
 
     public TwitterSpout(String consumerKey, String consumerSecret,
                         String accessToken, String accessTokenSecret, String[] keyWords)
@@ -57,17 +67,28 @@ public class TwitterSpout extends BaseRichSpout
             @Override
             public void onStatus(Status status)
             {
-                try
+                if (status.getGeoLocation() == null)
                 {
-                    Class<?> c = Class.forName("twitter4j.StatusJSONImpl");
+                    try
+                    {
+                        Class<?> statusImpl = Class.forName("twitter4j.StatusJSONImpl");
 
-                    Field f = c.getDeclaredField("geoLocation");
-                    f.setAccessible(true);
-                    f.set(status, new GeoLocation(1, 1));
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
+                        Field geoLocation = statusImpl.getDeclaredField("geoLocation");
+                        geoLocation.setAccessible(true);
+                        geoLocation.set(status, new GeoLocation(randomInRange(minLat, maxLat),
+                                randomInRange(minLng, maxLng)));
+
+                        if (status.getPlace() == null)
+                        {
+                            Field place = statusImpl.getDeclaredField("place");
+                            place.setAccessible(true);
+                            place.set(status, simulatedPlace("simulated"));
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
 
                 queue.offer(status);
@@ -173,5 +194,112 @@ public class TwitterSpout extends BaseRichSpout
     public void declareOutputFields(OutputFieldsDeclarer declarer)
     {
         declarer.declare(new Fields("tweet"));
+    }
+
+    private double randomInRange(double min, double max)
+    {
+        return ThreadLocalRandom.current().nextDouble(min, max);
+    }
+
+    private Place simulatedPlace(String name)
+    {
+        return new Place()
+        {
+            @Override
+            public String getName()
+            {
+                return name;
+            }
+
+            @Override
+            public String getStreetAddress()
+            {
+                return null;
+            }
+
+            @Override
+            public String getCountryCode()
+            {
+                return null;
+            }
+
+            @Override
+            public String getId()
+            {
+                return null;
+            }
+
+            @Override
+            public String getCountry()
+            {
+                return null;
+            }
+
+            @Override
+            public String getPlaceType()
+            {
+                return null;
+            }
+
+            @Override
+            public String getURL()
+            {
+                return null;
+            }
+
+            @Override
+            public String getFullName()
+            {
+                return null;
+            }
+
+            @Override
+            public String getBoundingBoxType()
+            {
+                return null;
+            }
+
+            @Override
+            public GeoLocation[][] getBoundingBoxCoordinates()
+            {
+                return new GeoLocation[0][];
+            }
+
+            @Override
+            public String getGeometryType()
+            {
+                return null;
+            }
+
+            @Override
+            public GeoLocation[][] getGeometryCoordinates()
+            {
+                return new GeoLocation[0][];
+            }
+
+            @Override
+            public Place[] getContainedWithIn()
+            {
+                return new Place[0];
+            }
+
+            @Override
+            public int compareTo(Place o)
+            {
+                return 0;
+            }
+
+            @Override
+            public RateLimitStatus getRateLimitStatus()
+            {
+                return null;
+            }
+
+            @Override
+            public int getAccessLevel()
+            {
+                return 0;
+            }
+        };
     }
 }

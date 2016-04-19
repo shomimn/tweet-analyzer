@@ -7,6 +7,8 @@ import com.mnm.producer.VehicleProducer;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Main
 {
@@ -27,7 +29,7 @@ public class Main
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(System.in)))
         {
             VehicleProducer vehicleProducer = new VehicleProducer(1000);
-//            vehicleProducer.run();
+            vehicleProducer.run();
             TaxiProducer taxiProducer = new TaxiProducer(500);
 //            taxiProducer.run();
 
@@ -52,7 +54,7 @@ public class Main
                 }
             }
             vehicleProducer.close();
-            taxiProducer.close();
+//            taxiProducer.close();
 
         }
         catch (Exception e)
