@@ -1,5 +1,6 @@
 package spout;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -11,6 +12,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 import twitter4j.FilterQuery;
+import twitter4j.GeoLocation;
 import twitter4j.StallWarning;
 import twitter4j.Status;
 import twitter4j.StatusDeletionNotice;
@@ -55,6 +57,19 @@ public class TwitterSpout extends BaseRichSpout
             @Override
             public void onStatus(Status status)
             {
+                try
+                {
+                    Class<?> c = Class.forName("twitter4j.StatusJSONImpl");
+
+                    Field f = c.getDeclaredField("geoLocation");
+                    f.setAccessible(true);
+                    f.set(status, new GeoLocation(1, 1));
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
                 queue.offer(status);
             }
 

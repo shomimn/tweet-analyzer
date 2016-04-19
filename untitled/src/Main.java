@@ -83,23 +83,23 @@ public class Main
         BrokerHosts hosts = new ZkHosts("localhost:2181");
         SpoutConfig spoutConfig = new SpoutConfig(hosts, TAXI_TOPIC, "/" + TAXI_TOPIC, UUID.randomUUID().toString());
         spoutConfig.scheme = new KeyValueSchemeAsMultiScheme(new TaxiScheme());
-        KafkaSpout kafkaSpout = new KafkaSpout(spoutConfig);
+//        KafkaSpout kafkaSpout = new KafkaSpout(spoutConfig);
 
         TimeFragmenter fragmenter = new TimeFragmenter(DURATION, TIME_UNITS);
 
         SpoutConfig spoutConfigVehicle = new SpoutConfig(hosts, VEHICLE_TOPIC, "/" + VEHICLE_TOPIC, UUID.randomUUID().toString());
         spoutConfigVehicle.scheme = new KeyValueSchemeAsMultiScheme(new VehicleScheme());
-        KafkaSpout vehicleSpout = new KafkaSpout(spoutConfigVehicle);
+//        KafkaSpout vehicleSpout = new KafkaSpout(spoutConfigVehicle);
 
-        builder.setSpout("taxiSpout", kafkaSpout);
+//        builder.setSpout("taxiSpout", kafkaSpout);
 
-        builder.setBolt(TaxiBolt.ID, new TaxiBolt())
-                .shuffleGrouping("taxiSpout");
+//        builder.setBolt(TaxiBolt.ID, new TaxiBolt())
+//                .shuffleGrouping("taxiSpout");
 
-        builder.setSpout("vehicleSpout", vehicleSpout);
+//        builder.setSpout("vehicleSpout", vehicleSpout);
 
-        builder.setBolt(VehicleBolt.ID, new VehicleBolt())
-                .shuffleGrouping("vehicleSpout");
+//        builder.setBolt(VehicleBolt.ID, new VehicleBolt())
+//                .shuffleGrouping("vehicleSpout");
 
         builder.setSpout(TwitterSpout.ID, new TwitterSpout(appConfig.consumerKey, appConfig.consumerSecret,
                 appConfig.accessToken, appConfig.accessTokenSecret, keyWords));
@@ -108,8 +108,8 @@ public class Main
                 .shuffleGrouping(TwitterSpout.ID);
 
         builder.setBolt(LatLngBolt.ID, new LatLngBolt(fragmenter, appConfig.poiPath))
-                .shuffleGrouping(PrinterBolt.ID, PrinterBolt.LAT_LNG_STREAM)
-                .shuffleGrouping(TaxiBolt.ID, TaxiBolt.TAXI_BOLT_STREAM);
+                .shuffleGrouping(PrinterBolt.ID, PrinterBolt.LAT_LNG_STREAM);
+//                .shuffleGrouping(TaxiBolt.ID, TaxiBolt.TAXI_BOLT_STREAM);
 
         builder.setBolt(PlaceBolt.ID, new PlaceBolt())
                 .shuffleGrouping(PrinterBolt.ID, PrinterBolt.PLACE_STREAM);
@@ -121,8 +121,8 @@ public class Main
                 .shuffleGrouping(LatLngBolt.ID, LatLngBolt.STREAM)
                 .shuffleGrouping(LatLngBolt.ID, LatLngBolt.TAXI_POI_STREAM)
                 .shuffleGrouping(PlaceBolt.ID, PlaceBolt.STREAM)
-                .shuffleGrouping(TimePointBolt.ID, TimePointBolt.STREAM)
-                .shuffleGrouping(VehicleBolt.ID, VehicleBolt.STREAM);
+                .shuffleGrouping(TimePointBolt.ID, TimePointBolt.STREAM);
+//                .shuffleGrouping(VehicleBolt.ID, VehicleBolt.STREAM);
 
         Config config = new Config();
 //        config.setDebug(true);

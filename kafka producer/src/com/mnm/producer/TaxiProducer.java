@@ -15,15 +15,17 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
-public class TaxiProducer
+
+public class TaxiProducer extends BaseProducer<Taxi>
 {
     public static final String TAXI_TOPIC = "taxi-topic";
     public static final String FILE_PATH = "/home/milos/IdeaProjects/tweet-analyzer/untitled/trip_data_1.csv";
-    public Producer<String, Taxi> producer;
-    String[] values;
+//    public Producer<String, Taxi> producer;
 
-    public TaxiProducer()
+    public TaxiProducer(long sleepTime)
     {
+        super(sleepTime);
+
         Properties props = new Properties();
         props.put("bootstrap.servers", "localhost:9092");
         props.put("acks", "all");
@@ -38,50 +40,46 @@ public class TaxiProducer
     }
     public void run()
     {
-
-        BufferedReader bufferedReader = null;
-        String line;
-        int ind = 0;
-
-        try
+        thread = new Thread(new Runnable()
         {
-            bufferedReader = new BufferedReader(new FileReader(FILE_PATH));
-            bufferedReader.readLine();
-            while ((line = bufferedReader.readLine()) != null)
+            @Override
+            public void run()
             {
-                String[] values = line.split(",");
+                String line;
+                int ind = 0;
 
-                if (values.length < 13)
-                    continue;
-
-                Taxi taxi = new Taxi(Double.parseDouble(values[11]), Double.parseDouble(values[10]), Double.parseDouble(values[13]), Double.parseDouble(values[12]));
-
-                //u fajlu postoje redovi gde su sve tacke 0, pa sam ih izbacio
-                if(taxi.pickupLatitude != 0)
+                try(BufferedReader bufferedReader = new BufferedReader(new FileReader(FILE_PATH)))
                 {
-                    producer.send(new ProducerRecord<String, Taxi>(TAXI_TOPIC, Integer.toString(ind++), taxi));
-                    Utils.sleep(500);
-                }
-            }
+                    bufferedReader.readLine();
+                    while ((line = bufferedReader.readLine()) != null)
+                    {
+                        String[] values = line.split(",");
 
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        finally
-        {
-            if(bufferedReader != null)
-                try
-                {
-                    bufferedReader.close();
+                        if (values.length < 13)
+                            continue;
+
+                        Taxi taxi = new Taxi(Double.parseDouble(values[11]), Double.parseDouble(values[10]), Double.parseDouble(values[13]), Double.parseDouble(values[12]));
+
+                        //u fajlu postoje redovi gde su sve tacke 0, pa sam ih izbacio
+                        if (taxi.pickupLatitude != 0)
+                        {
+                            producer.send(new ProducerRecord<String, Taxi>(TAXI_TOPIC, Integer.toString(ind++), taxi));
+                            Utils.sleep(sleepTime);
+                        }
+                    }
+
                 }
-                catch (IOException e)
+                catch (Exception e)
                 {
                     e.printStackTrace();
                 }
-            producer.close();
-            System.out.println("taxi producer closed");
-        }
+                finally
+                {
+                    producer.close();
+                    System.out.println("taxi producer closed");
+                }
+            }
+        });
+        thread.start();
     }
 }
