@@ -7,13 +7,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7b3b8d07-e190-473d-a37d-3bf8321d0f01" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../kafka producer/kafka producer.iml" afterPath="$PROJECT_DIR$/../kafka producer/kafka producer.iml" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/untitled/TestBolt.class" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/META-INF/MANIFEST.MF" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/artifacts/untitled_jar/untitled.jar" afterPath="$PROJECT_DIR$/out/artifacts/untitled_jar/untitled.jar" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/kafka producer/com/mnm/Main.class" afterPath="$PROJECT_DIR$/out/production/kafka producer/com/mnm/Main.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/untitled/Main.class" afterPath="$PROJECT_DIR$/out/production/untitled/Main.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/untitled/bolt/TaxiBolt.class" afterPath="$PROJECT_DIR$/out/production/untitled/bolt/TaxiBolt.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/untitled/bolt/VehicleBolt.class" afterPath="$PROJECT_DIR$/out/production/untitled/bolt/VehicleBolt.class" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/untitled/util/AppConfig.class" afterPath="$PROJECT_DIR$/out/production/untitled/util/AppConfig.class" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../kafka producer/src/com/mnm/Main.java" afterPath="$PROJECT_DIR$/../kafka producer/src/com/mnm/Main.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/untitled_jar.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/untitled_jar.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/untitled/META-INF/MANIFEST.MF" afterPath="$PROJECT_DIR$/out/production/untitled/META-INF/MANIFEST.MF" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/Main.java" afterPath="$PROJECT_DIR$/src/Main.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/spout/TwitterSpout.java" afterPath="$PROJECT_DIR$/src/spout/TwitterSpout.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/untitled.iml" afterPath="$PROJECT_DIR$/untitled.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/bolt/ResultBolt.java" afterPath="$PROJECT_DIR$/src/bolt/ResultBolt.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/bolt/TaxiBolt.java" afterPath="$PROJECT_DIR$/src/bolt/TaxiBolt.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/bolt/VehicleBolt.java" afterPath="$PROJECT_DIR$/src/bolt/VehicleBolt.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/util/AppConfig.java" afterPath="$PROJECT_DIR$/src/util/AppConfig.java" />
     </list>
     <ignored path="untitled.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -39,17 +49,32 @@
         <entry file="file://$PROJECT_DIR$/src/Main.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="123" column="72" selection-start-line="123" selection-start-column="72" selection-end-line="123" selection-end-column="72" />
-              <folding />
+              <caret line="55" column="26" selection-start-line="55" selection-start-column="26" selection-end-line="55" selection-end-column="26" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Main.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/../kafka producer/src/com/mnm/Main.java">
+      <file leaf-file-name="ResultBolt.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/bolt/ResultBolt.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.6990741">
-              <caret line="53" column="17" selection-start-line="53" selection-start-column="17" selection-end-line="53" selection-end-column="17" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="57" column="9" selection-start-line="57" selection-start-column="9" selection-end-line="57" selection-end-column="9" />
+              <folding>
+                <element signature="e#11306#11307#0" expanded="true" />
+                <element signature="e#11337#11338#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="AppConfig.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/util/AppConfig.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="69" column="17" selection-start-line="69" selection-start-column="17" selection-end-line="69" selection-end-column="17" />
               <folding />
             </state>
           </provider>
@@ -59,12 +84,9 @@
         <entry file="file://$PROJECT_DIR$/../kafka producer/src/com/mnm/producer/VehicleProducer.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="48" column="21" selection-start-line="48" selection-start-column="21" selection-end-line="48" selection-end-column="21" />
+              <caret line="41" column="21" selection-start-line="41" selection-start-column="21" selection-end-line="41" selection-end-column="21" />
               <folding>
-                <element signature="imports" expanded="false" />
                 <marker date="1461066654681" expanded="true" signature="2372:2510" placeholder="{...}" />
-                <marker date="1461066654681" expanded="true" signature="2372:2520" placeholder="{...}" />
-                <marker date="1461066654681" expanded="true" signature="2372:2553" placeholder="{...}" />
               </folding>
             </state>
           </provider>
@@ -83,79 +105,51 @@
           </provider>
         </entry>
       </file>
+      <file leaf-file-name="Main.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/../kafka producer/src/com/mnm/Main.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.2777778">
+              <caret line="20" column="5" selection-start-line="20" selection-start-column="5" selection-end-line="20" selection-end-column="5" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="BaseProducer.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/../kafka producer/src/com/mnm/producer/BaseProducer.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
               <caret line="30" column="0" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
-              <folding>
-                <element signature="e#411#412#0" expanded="false" />
-                <element signature="e#443#444#0" expanded="false" />
-              </folding>
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PrinterBolt.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/bolt/PrinterBolt.java">
+      <file leaf-file-name="appconfig" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/appconfig">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="32" column="0" selection-start-line="32" selection-start-column="0" selection-end-line="32" selection-end-column="0" />
-              <folding>
-                <element signature="imports" expanded="false" />
-              </folding>
+              <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="TwitterSpout.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/spout/TwitterSpout.java">
+      <file leaf-file-name="VehicleBolt.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/bolt/VehicleBolt.java">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
-              <caret line="85" column="25" selection-start-line="85" selection-start-column="25" selection-end-line="85" selection-end-column="25" />
-              <folding>
-                <element signature="e#5813#5814#0" expanded="true" />
-                <element signature="e#5856#5857#0" expanded="true" />
-                <element signature="e#5938#5939#0" expanded="true" />
-                <element signature="e#5981#5982#0" expanded="true" />
-                <element signature="e#6061#6062#0" expanded="true" />
-                <element signature="e#6104#6105#0" expanded="true" />
-                <element signature="e#6175#6176#0" expanded="true" />
-                <element signature="e#6218#6219#0" expanded="true" />
-                <element signature="e#6294#6295#0" expanded="true" />
-                <element signature="e#6337#6338#0" expanded="true" />
-                <element signature="e#6415#6416#0" expanded="true" />
-                <element signature="e#6458#6459#0" expanded="true" />
-                <element signature="e#6530#6531#0" expanded="true" />
-                <element signature="e#6573#6574#0" expanded="true" />
-                <element signature="e#6650#6651#0" expanded="true" />
-                <element signature="e#6693#6694#0" expanded="true" />
-                <element signature="e#6777#6778#0" expanded="true" />
-                <element signature="e#6820#6821#0" expanded="true" />
-                <element signature="e#6920#6921#0" expanded="true" />
-                <element signature="e#6979#6980#0" expanded="true" />
-                <element signature="e#7060#7061#0" expanded="true" />
-                <element signature="e#7103#7104#0" expanded="true" />
-                <element signature="e#7200#7201#0" expanded="true" />
-                <element signature="e#7259#7260#0" expanded="true" />
-                <element signature="e#7344#7345#0" expanded="true" />
-                <element signature="e#7395#7396#0" expanded="true" />
-                <element signature="e#7474#7475#0" expanded="true" />
-                <element signature="e#7514#7515#0" expanded="true" />
-                <element signature="e#7607#7608#0" expanded="true" />
-                <element signature="e#7650#7651#0" expanded="true" />
-                <element signature="e#7727#7728#0" expanded="true" />
-                <element signature="e#7767#7768#0" expanded="true" />
-              </folding>
+              <caret line="46" column="11" selection-start-line="46" selection-start-column="11" selection-end-line="46" selection-end-column="11" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PlaceJSONImpl.class" pinned="false" current-in-tab="false">
-        <entry file="jar://$MAVEN_REPOSITORY$/org/twitter4j/twitter4j-core/4.0.4/twitter4j-core-4.0.4.jar!/twitter4j/PlaceJSONImpl.class">
+      <file leaf-file-name="TaxiBolt.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/bolt/TaxiBolt.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-7.2413793">
-              <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -188,26 +182,27 @@
         <option value="$PROJECT_DIR$/src/AppConfig.java" />
         <option value="$PROJECT_DIR$/src/util/TimeFragmenter.java" />
         <option value="$PROJECT_DIR$/src/bolt/TimeUnitBolt.java" />
-        <option value="$PROJECT_DIR$/src/util/AppConfig.java" />
-        <option value="$PROJECT_DIR$/src/util/POIRepository.java" />
         <option value="$PROJECT_DIR$/src/util/POI.java" />
-        <option value="$PROJECT_DIR$/appconfig" />
         <option value="$PROJECT_DIR$/src/util/OptionsHandler.java" />
         <option value="$PROJECT_DIR$/src/scheme/VehicleScheme.java" />
-        <option value="$PROJECT_DIR$/src/bolt/VehicleBolt.java" />
         <option value="$PROJECT_DIR$/src/bolt/LatLngBolt.java" />
         <option value="$PROJECT_DIR$/src/scheme/TaxiScheme.java" />
         <option value="$PROJECT_DIR$/src/server/WebServer.java" />
         <option value="$PROJECT_DIR$/src/ServerSingleton.java" />
-        <option value="$PROJECT_DIR$/src/bolt/ResultBolt.java" />
         <option value="$PROJECT_DIR$/src/util/ServerSingleton.java" />
         <option value="$PROJECT_DIR$/src/bolt/PrinterBolt.java" />
         <option value="$PROJECT_DIR$/../kafka producer/src/com/mnm/producer/BaseProducer.java" />
         <option value="$PROJECT_DIR$/../kafka producer/src/com/mnm/producer/VehicleProducer.java" />
         <option value="$PROJECT_DIR$/../kafka producer/src/com/mnm/producer/TaxiProducer.java" />
-        <option value="$PROJECT_DIR$/../kafka producer/src/com/mnm/Main.java" />
         <option value="$PROJECT_DIR$/src/spout/TwitterSpout.java" />
+        <option value="$PROJECT_DIR$/src/util/POIRepository.java" />
+        <option value="$PROJECT_DIR$/appconfig" />
+        <option value="$PROJECT_DIR$/src/bolt/VehicleBolt.java" />
+        <option value="$PROJECT_DIR$/src/util/AppConfig.java" />
+        <option value="$PROJECT_DIR$/../kafka producer/src/com/mnm/Main.java" />
         <option value="$PROJECT_DIR$/src/Main.java" />
+        <option value="$PROJECT_DIR$/src/bolt/TaxiBolt.java" />
+        <option value="$PROJECT_DIR$/src/bolt/ResultBolt.java" />
       </list>
     </option>
   </component>
@@ -223,9 +218,9 @@
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="65" />
-    <option name="y" value="24" />
+    <option name="y" value="-4" />
     <option name="width" value="1855" />
-    <option name="height" value="1176" />
+    <option name="height" value="1204" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
     <entry key="Project Default">
@@ -271,7 +266,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -306,10 +300,6 @@
             <PATH_ELEMENT>
               <option name="myItemId" value="src" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="Main.java" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.ClassesTreeStructureProvider$PsiClassOwnerTreeNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
@@ -397,20 +387,6 @@
               <option name="myItemId" value="src" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="untitled" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="untitled" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="bolt" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
@@ -423,6 +399,20 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="kafka producer" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="untitled" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="kafka producer" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -468,6 +458,7 @@
           </PATH>
         </subPane>
       </pane>
+      <pane id="Scope" />
       <pane id="PackagesPane" />
       <pane id="Scratches" />
     </panes>
@@ -476,7 +467,7 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Font" />
     <property name="settings.editor.splitter.proportion" value="0.2" />
-    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.last.edited" value="Artifacts" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="Downloaded.Files.Path.Enabled" value="false" />
@@ -803,7 +794,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="65" y="24" width="1855" height="1176" extended-state="6" />
+    <frame x="65" y="-4" width="1855" height="1204" extended-state="6" />
     <editor active="false" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -813,7 +804,7 @@
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2719449" sideWeight="0.50435287" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32901135" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3555133" sideWeight="0.49564713" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3555133" sideWeight="0.49564713" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960412" sideWeight="0.49796867" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17855169" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -885,32 +876,11 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/spout/TwitterSpout.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="24" column="51" selection-start-line="24" selection-start-column="51" selection-end-line="24" selection-end-column="51" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/Main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/bolt/ResultBolt.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="99" column="13" selection-start-line="99" selection-start-column="13" selection-end-line="99" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/bolt/LatLngBolt.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="68" column="0" selection-start-line="68" selection-start-column="0" selection-end-line="68" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -939,7 +909,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -947,6 +919,10 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="82" column="17" selection-start-line="82" selection-start-column="17" selection-end-line="82" selection-end-column="17" />
+          <folding>
+            <element signature="e#11306#11307#0" expanded="true" />
+            <element signature="e#11337#11338#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -975,7 +951,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1063,13 +1041,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/util/POIRepository.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="39" column="8" selection-start-line="39" selection-start-column="8" selection-end-line="39" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/util/OptionsHandler.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1081,13 +1052,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="56" column="18" selection-start-line="56" selection-start-column="18" selection-end-line="56" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/bolt/VehicleBolt.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
         </state>
       </provider>
     </entry>
@@ -1112,13 +1076,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/appconfig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.09287926">
-          <caret line="4" column="13" selection-start-line="4" selection-start-column="13" selection-end-line="4" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/server/WebServer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1133,35 +1090,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/bolt/ResultBolt.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="285" column="0" selection-start-line="285" selection-start-column="0" selection-end-line="285" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/util/AppConfig.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="81" column="13" selection-start-line="81" selection-start-column="13" selection-end-line="81" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/bolt/LatLngBolt.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="104" column="9" selection-start-line="104" selection-start-column="9" selection-end-line="104" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/../kafka producer/src/com/mnm/producer/BaseProducer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.047091413">
           <caret line="2" column="22" selection-start-line="2" selection-start-column="22" selection-end-line="2" selection-end-column="22" />
-          <folding>
-            <element signature="e#411#412#0" expanded="false" />
-            <element signature="e#443#444#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1203,14 +1136,100 @@
         </state>
       </provider>
     </entry>
+    <entry file="jar://$MAVEN_REPOSITORY$/org/twitter4j/twitter4j-core/4.0.4/twitter4j-core-4.0.4.jar!/twitter4j/PlaceJSONImpl.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-7.2413793">
+          <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/spout/TwitterSpout.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="85" column="25" selection-start-line="85" selection-start-column="25" selection-end-line="85" selection-end-column="25" />
+          <folding>
+            <element signature="e#5813#5814#0" expanded="false" />
+            <element signature="e#5856#5857#0" expanded="false" />
+            <element signature="e#5938#5939#0" expanded="false" />
+            <element signature="e#5981#5982#0" expanded="false" />
+            <element signature="e#6061#6062#0" expanded="false" />
+            <element signature="e#6104#6105#0" expanded="false" />
+            <element signature="e#6175#6176#0" expanded="false" />
+            <element signature="e#6218#6219#0" expanded="false" />
+            <element signature="e#6294#6295#0" expanded="false" />
+            <element signature="e#6337#6338#0" expanded="false" />
+            <element signature="e#6415#6416#0" expanded="false" />
+            <element signature="e#6458#6459#0" expanded="false" />
+            <element signature="e#6530#6531#0" expanded="false" />
+            <element signature="e#6573#6574#0" expanded="false" />
+            <element signature="e#6650#6651#0" expanded="false" />
+            <element signature="e#6693#6694#0" expanded="false" />
+            <element signature="e#6777#6778#0" expanded="false" />
+            <element signature="e#6820#6821#0" expanded="false" />
+            <element signature="e#6920#6921#0" expanded="false" />
+            <element signature="e#6979#6980#0" expanded="false" />
+            <element signature="e#7060#7061#0" expanded="false" />
+            <element signature="e#7103#7104#0" expanded="false" />
+            <element signature="e#7200#7201#0" expanded="false" />
+            <element signature="e#7259#7260#0" expanded="false" />
+            <element signature="e#7344#7345#0" expanded="false" />
+            <element signature="e#7395#7396#0" expanded="false" />
+            <element signature="e#7474#7475#0" expanded="false" />
+            <element signature="e#7514#7515#0" expanded="false" />
+            <element signature="e#7607#7608#0" expanded="false" />
+            <element signature="e#7650#7651#0" expanded="false" />
+            <element signature="e#7727#7728#0" expanded="false" />
+            <element signature="e#7767#7768#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///usr/lib/jvm/java-8-oracle/src.zip!/java/lang/Thread.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.33333334">
+          <caret line="744" column="0" selection-start-line="744" selection-start-column="0" selection-end-line="744" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/bolt/LatLngBolt.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="104" column="9" selection-start-line="104" selection-start-column="9" selection-end-line="104" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/util/POIRepository.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="49" column="34" selection-start-line="49" selection-start-column="34" selection-end-line="49" selection-end-column="34" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/util/Taxi.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="18" column="5" selection-start-line="18" selection-start-column="5" selection-end-line="18" selection-end-column="5" />
+          <folding>
+            <element signature="e#490#491#0" expanded="false" />
+            <element signature="e#529#530#0" expanded="false" />
+            <element signature="e#577#578#0" expanded="false" />
+            <element signature="e#617#618#0" expanded="false" />
+            <element signature="e#666#667#0" expanded="false" />
+            <element signature="e#706#707#0" expanded="false" />
+            <element signature="e#755#756#0" expanded="false" />
+            <element signature="e#796#797#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/../kafka producer/src/com/mnm/producer/BaseProducer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="30" column="0" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
-          <folding>
-            <element signature="e#411#412#0" expanded="false" />
-            <element signature="e#443#444#0" expanded="false" />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1228,77 +1247,70 @@
     <entry file="file://$PROJECT_DIR$/../kafka producer/src/com/mnm/producer/VehicleProducer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="48" column="21" selection-start-line="48" selection-start-column="21" selection-end-line="48" selection-end-column="21" />
+          <caret line="41" column="21" selection-start-line="41" selection-start-column="21" selection-end-line="41" selection-end-column="21" />
           <folding>
-            <element signature="imports" expanded="false" />
             <marker date="1461066654681" expanded="true" signature="2372:2510" placeholder="{...}" />
-            <marker date="1461066654681" expanded="true" signature="2372:2520" placeholder="{...}" />
-            <marker date="1461066654681" expanded="true" signature="2372:2553" placeholder="{...}" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="jar://$MAVEN_REPOSITORY$/org/twitter4j/twitter4j-core/4.0.4/twitter4j-core-4.0.4.jar!/twitter4j/PlaceJSONImpl.class">
+    <entry file="file://$PROJECT_DIR$/src/bolt/TaxiBolt.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-7.2413793">
-          <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/spout/TwitterSpout.java">
+    <entry file="file://$PROJECT_DIR$/src/bolt/VehicleBolt.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="85" column="25" selection-start-line="85" selection-start-column="25" selection-end-line="85" selection-end-column="25" />
-          <folding>
-            <element signature="e#5813#5814#0" expanded="true" />
-            <element signature="e#5856#5857#0" expanded="true" />
-            <element signature="e#5938#5939#0" expanded="true" />
-            <element signature="e#5981#5982#0" expanded="true" />
-            <element signature="e#6061#6062#0" expanded="true" />
-            <element signature="e#6104#6105#0" expanded="true" />
-            <element signature="e#6175#6176#0" expanded="true" />
-            <element signature="e#6218#6219#0" expanded="true" />
-            <element signature="e#6294#6295#0" expanded="true" />
-            <element signature="e#6337#6338#0" expanded="true" />
-            <element signature="e#6415#6416#0" expanded="true" />
-            <element signature="e#6458#6459#0" expanded="true" />
-            <element signature="e#6530#6531#0" expanded="true" />
-            <element signature="e#6573#6574#0" expanded="true" />
-            <element signature="e#6650#6651#0" expanded="true" />
-            <element signature="e#6693#6694#0" expanded="true" />
-            <element signature="e#6777#6778#0" expanded="true" />
-            <element signature="e#6820#6821#0" expanded="true" />
-            <element signature="e#6920#6921#0" expanded="true" />
-            <element signature="e#6979#6980#0" expanded="true" />
-            <element signature="e#7060#7061#0" expanded="true" />
-            <element signature="e#7103#7104#0" expanded="true" />
-            <element signature="e#7200#7201#0" expanded="true" />
-            <element signature="e#7259#7260#0" expanded="true" />
-            <element signature="e#7344#7345#0" expanded="true" />
-            <element signature="e#7395#7396#0" expanded="true" />
-            <element signature="e#7474#7475#0" expanded="true" />
-            <element signature="e#7514#7515#0" expanded="true" />
-            <element signature="e#7607#7608#0" expanded="true" />
-            <element signature="e#7650#7651#0" expanded="true" />
-            <element signature="e#7727#7728#0" expanded="true" />
-            <element signature="e#7767#7768#0" expanded="true" />
-          </folding>
+          <caret line="46" column="11" selection-start-line="46" selection-start-column="11" selection-end-line="46" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/util/AppConfig.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="69" column="17" selection-start-line="69" selection-start-column="17" selection-end-line="69" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/appconfig">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="7" column="0" selection-start-line="7" selection-start-column="0" selection-end-line="7" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/Main.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="123" column="72" selection-start-line="123" selection-start-column="72" selection-end-line="123" selection-end-column="72" />
-          <folding />
+          <caret line="55" column="26" selection-start-line="55" selection-start-column="26" selection-end-line="55" selection-end-column="26" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/bolt/ResultBolt.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="57" column="9" selection-start-line="57" selection-start-column="9" selection-end-line="57" selection-end-column="9" />
+          <folding>
+            <element signature="e#11306#11307#0" expanded="true" />
+            <element signature="e#11337#11338#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/../kafka producer/src/com/mnm/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.6990741">
-          <caret line="53" column="17" selection-start-line="53" selection-start-column="17" selection-end-line="53" selection-end-column="17" />
+        <state vertical-scroll-proportion="0.2777778">
+          <caret line="20" column="5" selection-start-line="20" selection-start-column="5" selection-end-line="20" selection-end-column="5" />
           <folding />
         </state>
       </provider>

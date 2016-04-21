@@ -31,7 +31,7 @@ public class Main
             VehicleProducer vehicleProducer = new VehicleProducer(1000);
             vehicleProducer.run();
             TaxiProducer taxiProducer = new TaxiProducer(500);
-//            taxiProducer.run();
+            taxiProducer.run();
 
             producers.put(VEHICLE_KEY, vehicleProducer);
             producers.put(TAXI_KEY, taxiProducer);
@@ -54,7 +54,7 @@ public class Main
                 }
             }
             vehicleProducer.close();
-//            taxiProducer.close();
+            taxiProducer.close();
 
         }
         catch (Exception e)

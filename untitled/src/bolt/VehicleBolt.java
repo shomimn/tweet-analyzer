@@ -32,18 +32,21 @@ public class VehicleBolt extends BaseRichBolt
     @Override
     public void execute(Tuple tuple)
     {
-        String key = tuple.getString(0);
-
-        if(!keys.contains(key))
-        {
-            keys.add(key);
+//        String key = tuple.getString(0);
+//
+//        if(!keys.contains(key))
+//        {
+//            keys.add(key);
             Long id = tuple.getLong(1);
             Long timestamp = tuple.getLong(2);
             Double lat = tuple.getDouble(3);
             Double lon = tuple.getDouble(4);
             DateTime date = DateTime.now();
             collector.emit(STREAM, new Values(id, timestamp, lat, lon, date));
-        }
+            collector.ack(tuple);
+//        }
+//        else
+//            System.out.println("VEHICLESPOUT REPEAT");
     }
 
     @Override

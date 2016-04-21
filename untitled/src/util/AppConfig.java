@@ -43,6 +43,7 @@ public class AppConfig
     public String poiPath;
     public double test1;
     public int test2;
+    public String zkHost;
 
     private HashMap<String, Converter> converterMap;
 

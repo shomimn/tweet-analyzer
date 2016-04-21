@@ -13,9 +13,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 
-/**
- * Created by nimbus on 4/9/16.
- */
 public class TaxiBolt implements IRichBolt {
 
     public static final String ID = "taxiBolt";
@@ -35,14 +32,17 @@ public class TaxiBolt implements IRichBolt {
     {
 //        System.out.println(tuple.toString());
 //        System.out.println("( " + tuple.getDouble(2) + ", " + tuple.getDouble(3) + " ) - TAXI");
-        String key = tuple.getString(0);
-        if(!keySet.contains(key))
-        {
-            keySet.add(key);
+//        String key = tuple.getString(0);
+//        if(!keySet.contains(key))
+//        {
+//            keySet.add(key);
 //            collector.emit(TAXI_BOLT_STREAM, new Values(tuple.getDouble(3), tuple.getDouble(4), tuple.getValue(5)));
             collector.emit(TAXI_BOLT_STREAM, new Values(tuple.getDouble(1), tuple.getDouble(2),
                     tuple.getDouble(3), tuple.getDouble(4), tuple.getValue(5)));
-        }
+            collector.ack(tuple);
+//        }
+//        else
+//            System.out.println("TAXISPOUT REPEAT");
     }
 
     @Override

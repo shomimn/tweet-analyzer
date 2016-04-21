@@ -4,6 +4,7 @@ import java.util.UUID;
 
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
+import backtype.storm.StormSubmitter;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
 import backtype.storm.topology.IRichBolt;
@@ -17,7 +18,6 @@ import bolt.ResultBolt;
 import bolt.TimePointBolt;
 import bolt.LatLngBolt;
 import scheme.TaxiScheme;
-import server.WebServer;
 import spout.TwitterSpout;
 import storm.kafka.BrokerHosts;
 import storm.kafka.KafkaSpout;
@@ -28,41 +28,6 @@ import bolt.*;
 import scheme.VehicleScheme;
 import util.AppConfig;
 import util.TimeFragmenter;
-
-class TestBolt implements IRichBolt
-{
-    private OutputCollector collector;
-    @Override
-    public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector)
-    {
-        collector = outputCollector;
-    }
-
-    @Override
-    public void execute(Tuple tuple)
-    {
-//        System.out.println(tuple.getString(0));
-        System.out.println(tuple.toString());
-    }
-
-    @Override
-    public void cleanup()
-    {
-
-    }
-
-    @Override
-    public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer)
-    {
-
-    }
-
-    @Override
-    public Map<String, Object> getComponentConfiguration()
-    {
-        return null;
-    }
-}
 
 public class Main
 {
@@ -83,7 +48,7 @@ public class Main
         BrokerHosts hosts = new ZkHosts("localhost:2181");
         SpoutConfig spoutConfig = new SpoutConfig(hosts, TAXI_TOPIC, "/" + TAXI_TOPIC, UUID.randomUUID().toString());
         spoutConfig.scheme = new KeyValueSchemeAsMultiScheme(new TaxiScheme());
-//        KafkaSpout kafkaSpout = new KafkaSpout(spoutConfig);
+        KafkaSpout kafkaSpout = new KafkaSpout(spoutConfig);
 
         TimeFragmenter fragmenter = new TimeFragmenter(DURATION, TIME_UNITS);
 
@@ -91,10 +56,10 @@ public class Main
         spoutConfigVehicle.scheme = new KeyValueSchemeAsMultiScheme(new VehicleScheme());
         KafkaSpout vehicleSpout = new KafkaSpout(spoutConfigVehicle);
 
-//        builder.setSpout("taxiSpout", kafkaSpout);
+        builder.setSpout("taxiSpout", kafkaSpout);
 
-//        builder.setBolt(TaxiBolt.ID, new TaxiBolt())
-//                .shuffleGrouping("taxiSpout");
+        builder.setBolt(TaxiBolt.ID, new TaxiBolt())
+                .shuffleGrouping("taxiSpout");
 
         builder.setSpout("vehicleSpout", vehicleSpout);
 
@@ -108,8 +73,8 @@ public class Main
                 .shuffleGrouping(TwitterSpout.ID);
 
         builder.setBolt(LatLngBolt.ID, new LatLngBolt(fragmenter, appConfig.poiPath))
-                .shuffleGrouping(PrinterBolt.ID, PrinterBolt.LAT_LNG_STREAM);
-//                .shuffleGrouping(TaxiBolt.ID, TaxiBolt.TAXI_BOLT_STREAM);
+                .shuffleGrouping(PrinterBolt.ID, PrinterBolt.LAT_LNG_STREAM)
+                .shuffleGrouping(TaxiBolt.ID, TaxiBolt.TAXI_BOLT_STREAM);
 
         builder.setBolt(PlaceBolt.ID, new PlaceBolt())
                 .shuffleGrouping(PrinterBolt.ID, PrinterBolt.PLACE_STREAM);
@@ -126,12 +91,14 @@ public class Main
 
         Config config = new Config();
 //        config.setDebug(true);
+//        config.setNumWorkers(2);
 
         LocalCluster cluster = new LocalCluster();
 
         cluster.submitTopology("test", config, builder.createTopology());
 
-        Utils.sleep(DURATION);
+//        Utils.sleep(DURATION);
+//        StormSubmitter.submitTopology("tweet-analyzer", config, builder.createTopology());
 
 //        cluster.shutdown();
     }
