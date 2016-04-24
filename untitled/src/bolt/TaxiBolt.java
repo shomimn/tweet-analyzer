@@ -17,7 +17,6 @@ public class TaxiBolt implements IRichBolt {
 
     public static final String ID = "taxiBolt";
     public static final String TAXI_BOLT_STREAM = "taxiBoltStream";
-    private HashSet<String> keySet = new HashSet<>();
 
     private OutputCollector collector;
 
@@ -30,19 +29,9 @@ public class TaxiBolt implements IRichBolt {
     @Override
     public void execute(Tuple tuple)
     {
-//        System.out.println(tuple.toString());
-//        System.out.println("( " + tuple.getDouble(2) + ", " + tuple.getDouble(3) + " ) - TAXI");
-//        String key = tuple.getString(0);
-//        if(!keySet.contains(key))
-//        {
-//            keySet.add(key);
-//            collector.emit(TAXI_BOLT_STREAM, new Values(tuple.getDouble(3), tuple.getDouble(4), tuple.getValue(5)));
-            collector.emit(TAXI_BOLT_STREAM, new Values(tuple.getDouble(1), tuple.getDouble(2),
-                    tuple.getDouble(3), tuple.getDouble(4), tuple.getValue(5)));
-            collector.ack(tuple);
-//        }
-//        else
-//            System.out.println("TAXISPOUT REPEAT");
+        collector.emit(TAXI_BOLT_STREAM, new Values(tuple.getDouble(1), tuple.getDouble(2),
+                tuple.getDouble(3), tuple.getDouble(4), tuple.getValue(5)));
+        collector.ack(tuple);
     }
 
     @Override
@@ -54,7 +43,6 @@ public class TaxiBolt implements IRichBolt {
     @Override
     public void declareOutputFields(OutputFieldsDeclarer ofd)
     {
-//        ofd.declareStream(TAXI_BOLT_STREAM, new Fields("dropoffLat", "dropoffLon", "dropOffDateTime"));
         ofd.declareStream(TAXI_BOLT_STREAM, new Fields("pickupLat", "pickupLon", "dropoffLat", "dropoffLon", "dropOffDateTime"));
     }
 

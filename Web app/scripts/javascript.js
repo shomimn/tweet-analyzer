@@ -30,9 +30,17 @@ var indices = {};
 var playingAnim = null;
 var test = '';
 var newHeatmap = true;
+var showPois = true;
 var socket = null;
 var markers = {};
 var options = {};
+var timeStamps = [];
+
+var dateOptions = 
+{
+    year: 'numeric', month: 'numeric', day: 'numeric', weekday: 'long',
+    hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: false
+};
 
 google.charts.load("current", {packages:["corechart", "bar"]});
 
@@ -60,11 +68,13 @@ window.onload = function ()
     
     $("#showPOICheck").on("ifChecked", function()
     {
+        showPois = true;
         updateMarkers(currentLayer, map);
     });
     
     $("#showPOICheck").on("ifUnchecked", function()
     {
+        showPois = false;
         updateMarkers(currentLayer, null);
     });
     
@@ -121,6 +131,22 @@ function updateUi(data)
 {
     animateProgress(options.interval);
 
+    var now = new Date(Date.now());
+    var then = null;
+
+    if (timeStamps.length == 0)
+    {
+        then = new Date(now.getTime() - options.interval);
+        timeStamps.push(then);
+    }
+    else
+        then = timeStamps[currentLayer + 1];
+        
+    if (newHeatmap)
+        timeStamps.push(now);
+    else
+        timeStamps[timeStamps.length - 1] = now;
+        
     addPointsOnMap(data.tweets);
     addPOIs(data.twitterPois, "twitter");
     addPOIs(data.taxiPois, "taxi");
@@ -130,6 +156,7 @@ function updateUi(data)
 
     updateCount("total-taxis", data.taxiTotal);
     updateCount("total-vehicles", data.vehicleTotal);
+    setDate();
 
     $.each(data.places, function(key, value)
     {
@@ -152,6 +179,15 @@ function updateUi(data)
     });
 }
 
+function setDate()
+{
+    var start = timeStamps[currentLayer];
+    var end = timeStamps[currentLayer + 1];
+    
+    $("#fromTo").text(start.toLocaleString("en-GB", dateOptions) + " - " + 
+                      end.toLocaleString("en-GB", dateOptions));
+}
+
 function animateProgress(millis)
 {
     var offset = 2000;
@@ -170,8 +206,9 @@ function animateProgress(millis)
 function addPOIs(pois, poiType)
 {
 //    console.log(pois.length);
+    var switchLayers = currentLayer > -1 && currentLayer == heatmapArray.length - 1;
     
-    if (currentLayer > 0)
+    if (currentLayer > 0 && switchLayers)
         updateMarkers(currentLayer - 1, null);
     
     var array = [];
@@ -184,9 +221,9 @@ function addPOIs(pois, poiType)
         var latLng = new google.maps.LatLng(pois[i].latitude, pois[i].longitude);
         var marker = new google.maps.Marker({
             position: latLng,
-            map: map,
+            map: showPois && switchLayers ? map : null,
             title: pois[i].name,
-            icon: "images/"+poiType+"-marker.png"
+            icon: "images/" + poiType + "-marker.png"
         });
         
         marker.addListener('click', function() {
@@ -197,7 +234,15 @@ function addPOIs(pois, poiType)
         array.push(marker);
     }
     
-    (markers[poiType] = markers[poiType] || []).push(array)
+    markers[poiType] = markers[poiType] || [];
+    
+    if (newHeatmap)
+        markers[poiType].push(array);
+    else
+    {
+        var index = markers[poiType].length - 1;
+        markers[poiType][index] = markers[poiType][index].concat(array);
+    }
 }
 
 
@@ -243,7 +288,7 @@ function createDataTables()
     var orderedHours = {};
     var orderedMinutes = {};
     
-    for (var i = 1; i < 25; ++i)
+    for (var i = 0; i < 24; ++i)
         orderedHours[i] = 0;
     
     for (var i = 0; i < 60; ++i)
@@ -376,13 +421,17 @@ function addPointsOnMap(dataArray)
 {
     updateCount("total-tweets", dataArray.length);
     
+//    var index = currentLayer == heatmapArray.length - 1 ?
+//        currentLayer : heatmapArray.length - 1;
+    
+    var index = currentLayer == -1 ? -1 : heatmapArray.length - 1;
     var latLngArray = new google.maps.MVCArray();
 
     for(var i=0; i<dataArray.length; ++i)
     {        
         var data = dataArray[i];
         if (currentLayer > -1 && !newHeatmap)
-            heatmapArray[currentLayer].data.push(new google.maps.LatLng(data.latitude, data.longitude));
+            heatmapArray[index].data.push(new google.maps.LatLng(data.latitude, data.longitude));
         else
             latLngArray.push(new google.maps.LatLng(data.latitude, data.longitude));        
     }
@@ -396,11 +445,14 @@ function addPointsOnMap(dataArray)
 
         heatmapArray.push(hmap);
 
-        if (heatmapArray[currentLayer])
-            heatmapArray[currentLayer].setMap(null);
-        heatmapArray[++currentLayer].setMap(map);
-
-        $("#layer-id").val(currentLayer);
+        if (index == currentLayer)
+        {
+            if (heatmapArray[currentLayer])
+                heatmapArray[currentLayer].setMap(null);
+            
+            heatmapArray[++currentLayer].setMap(map);
+            $("#layer-id").val(currentLayer);
+        }
     }
 }
 
@@ -414,8 +466,8 @@ function updateCount(id, count)
 
 function showLayer()
 {
-    var layeriD = $("#layer-id").val();
-    if(parseInt(layeriD) < 0 || parseInt(layeriD) >= heatmapArray.length-1)
+    var layeriD = parseInt($("#layer-id").val());
+    if(layeriD < 0 || layeriD > heatmapArray.length - 1)
     {
         $("#layer-id").val(currentLayer);
         return;
@@ -424,7 +476,11 @@ function showLayer()
     heatmapArray[currentLayer].setMap(null);
     currentLayer = layeriD;
     heatmapArray[currentLayer].setMap(map);
-    updateMarkers(currentLayer, map);
+    
+    if (showPois)
+        updateMarkers(currentLayer, map);
+    
+    setDate();
 }
 
 function showPrevious()
@@ -436,8 +492,13 @@ function showPrevious()
     heatmapArray[currentLayer].setMap(null);
     currentLayer = parseInt(layeriD)-1;
     heatmapArray[currentLayer].setMap(map);
-    updateMarkers(currentLayer, map);
+    
+    if (showPois)
+        updateMarkers(currentLayer, map);
+    
     $("#layer-id").val(currentLayer);
+    
+    setDate();
 }
 
 function showNext()
@@ -453,8 +514,13 @@ function showNext()
     heatmapArray[currentLayer].setMap(null);
     currentLayer = parseInt(layeriD)+1;
     heatmapArray[currentLayer].setMap(map);
-    updateMarkers(currentLayer, map);
+    
+    if (showPois)
+        updateMarkers(currentLayer, map);
+    
     $("#layer-id").val(currentLayer);
+    
+    setDate();
 }
 
 function handle(e)

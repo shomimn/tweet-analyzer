@@ -36,7 +36,5 @@ public class PlaceBolt extends BaseRichBolt
     public void declareOutputFields(OutputFieldsDeclarer ofd)
     {
         ofd.declareStream(STREAM, new Fields("place"));
-
-//        ofd.declare(new Fields("place"));
     }
 }

@@ -1,5 +1,6 @@
 package bolt;
 
+import java.util.Date;
 import java.util.Map;
 
 import backtype.storm.task.OutputCollector;
@@ -8,21 +9,19 @@ import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
+import backtype.storm.tuple.Values;
 import twitter4j.Status;
-import util.POIRepository;
-import util.TimeFragmenter;
 
 public class TimePointBolt extends BaseRichBolt
 {
     public static final String ID = "timePointBolt";
     public static final String STREAM = "timePointStream";
+    private static final String[] days = new String[] { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
 
     private OutputCollector collector;
-    private TimeFragmenter fragmenter;
 
-    public TimePointBolt(TimeFragmenter timeFragmenter)
+    public TimePointBolt()
     {
-        fragmenter = timeFragmenter;
     }
 
     @Override
@@ -35,10 +34,13 @@ public class TimePointBolt extends BaseRichBolt
     public void execute(Tuple tuple)
     {
         Status status = (Status) tuple.getValue(0);
+        Date date = status.getCreatedAt();
 
-//        System.out.println(status.getCreatedAt().toString() + " " + fragmenter.getFragments(status.getCreatedAt()).toString());
+        String day = days[date.getDay()];
+        String hour = String.valueOf(date.getHours());
+        String minutes =  String.valueOf(date.getMinutes());
 
-        collector.emit(STREAM, fragmenter.getFragments(status.getCreatedAt()));
+        collector.emit(STREAM, new Values(day, hour, minutes));
     }
 
     @Override

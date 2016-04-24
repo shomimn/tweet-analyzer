@@ -17,14 +17,12 @@ import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Tuple;
-import org.apache.storm.shade.org.joda.time.DateTime;
+
 import org.apache.storm.shade.org.joda.time.Seconds;
 
 import server.WebServer;
-import twitter4j.Status;
 import util.OptionsHandler;
 import util.POI;
-import util.ServerSingleton;
 
 
 public class ResultBolt extends BaseBasicBolt implements OptionsHandler
@@ -101,96 +99,82 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
                 {
                     Gson gson = new Gson();
 
-                    clearBelowThreshold(twitterPoiMap, tweetThreshold);
-                    clearBelowThreshold(taxiPoiMap, taxiThreshold);
-
-                    SpatialReference ref = SpatialReference.create(SPATIAL_REF_WKID);
-                    Envelope envelope = new Envelope();
-
-                    for (Iterator<SpatialData> it = vehicleTweets.iterator(); it.hasNext(); )
-                    {
-                        SpatialData vehicle = it.next();
-                        Point p = new Point(vehicle.latitude, vehicle.longitude);
-                        Geometry geom = OperatorBuffer.local().execute(p, ref, BUFFER_DISTANCE, null);
-                        geom.queryEnvelope(envelope);
-
-                        DateTime refDateMin = vehicle.date.minusSeconds(TIME_OFFSET);
-                        DateTime refDateMax = vehicle.date.plusSeconds(TIME_OFFSET);
-
-                        boolean found = false;
-
-                        for (SpatialData data : list)
-                        {
-//                    if(envelope.contains(new Point(data.latitude,data.longitude)) && refDateMin.isBefore(data.date) && refDateMax.isAfter(data.date))
-//                    {
-//                        vehicleTweets.add(new SpatialData(latitude,longitude));
-//                        System.out.println("TWEET FROM VEHICLE: LAT: " + latitude + " LON: " + longitude);
-//                    }
-                            if (envelope.contains(new Point(data.latitude, data.longitude)) &&
-                                    refDateMin.isBefore(data.date) && refDateMax.isAfter(data.date))
-                            {
-                                found = true;
-                                System.out.println("TWEET FROM VEHICLE: LAT: " + vehicle.latitude + " LON: " + vehicle.longitude);
-                            }
-                        }
-
-                        if (!found)
-                            it.remove();
-                    }
-
-//                int i = 0;
-//                for (Map.Entry<POI, Integer> entry : taxiPoiMap.entrySet())
-//                {
-//                    if (i == 2)
-//                        break;
-//                    twitterPoiMap.put(entry.getKey(), entry.getValue());
-//                    ++i;
-//                }
-
-                    Set<POI> intersection = new HashSet<>(twitterPoiMap.keySet());
-                    intersection.retainAll(taxiPoiMap.keySet());
-                    twitterPoiMap.keySet().removeAll(intersection);
-                    taxiPoiMap.keySet().removeAll(intersection);
-
-
-                    System.out.println(list.size());
-//                System.out.println(gson.toJsonTree(taxiPoiMap.keySet(), poiType).toString());
-                    JsonElement tweets = gson.toJsonTree(list, listType);
-                    JsonElement places = gson.toJsonTree(placesMap, mapType);
-                    JsonElement days = gson.toJsonTree(daysMap, mapType);
-                    JsonElement hours = gson.toJsonTree(hoursMap, mapType);
-                    JsonElement mins = gson.toJsonTree(minsMap, mapType);
-                    JsonElement vehicles = gson.toJsonTree(vehicleTweets, listType);
-                    JsonElement twitterPois = gson.toJsonTree(twitterPoiMap.keySet(), poiType);
-                    JsonElement taxiPois = gson.toJsonTree(taxiPoiMap.keySet(), poiType);
-                    JsonElement taxiTwitterPois = gson.toJsonTree(intersection);
-
-
-                    JsonObject timePoints = new JsonObject();
-                    timePoints.add("days", days);
-                    timePoints.add("hours", hours);
-                    timePoints.add("mins", mins);
-
-                    JsonObject root = new JsonObject();
-                    root.add("tweets", tweets);
-                    root.add("places", places);
-                    root.add("timePoints", timePoints);
-                    root.add("vehiclesPOIS", vehicles);
-                    root.add("twitterPois", twitterPois);
-                    root.add("taxiPois", taxiPois);
-                    root.add("taxiTwitterPois", taxiTwitterPois);
-                    root.addProperty("taxiTotal", taxiCounter);
-                    root.addProperty("vehicleTotal", vehicleCounter);
-
-
-                    String json = root.toString();
-                    System.out.println(json);
-
-                    ServerSingleton.server.sendToAll(root);
-                    lastUpdate = DateTime.now();
-
                     synchronized (this)
                     {
+                        clearBelowThreshold(twitterPoiMap, tweetThreshold);
+                        clearBelowThreshold(taxiPoiMap, taxiThreshold);
+
+                        SpatialReference ref = SpatialReference.create(SPATIAL_REF_WKID);
+                        Envelope envelope = new Envelope();
+
+                        for (Iterator<SpatialData> it = vehicleTweets.iterator(); it.hasNext(); )
+                        {
+                            SpatialData vehicle = it.next();
+                            Point p = new Point(vehicle.latitude, vehicle.longitude);
+                            Geometry geom = OperatorBuffer.local().execute(p, ref, BUFFER_DISTANCE, null);
+                            geom.queryEnvelope(envelope);
+
+                            DateTime refDateMin = vehicle.date.minusSeconds(TIME_OFFSET);
+                            DateTime refDateMax = vehicle.date.plusSeconds(TIME_OFFSET);
+
+                            boolean found = false;
+
+                            for (SpatialData data : list)
+                            {
+                                if (envelope.contains(new Point(data.latitude, data.longitude)) &&
+                                        refDateMin.isBefore(data.date) && refDateMax.isAfter(data.date))
+                                {
+                                    found = true;
+                                    System.out.println("TWEET FROM VEHICLE: LAT: " + vehicle.latitude + " LON: " + vehicle.longitude);
+                                }
+                            }
+
+                            if (!found)
+                                it.remove();
+                        }
+
+                        Set<POI> intersection = new HashSet<>(twitterPoiMap.keySet());
+                        intersection.retainAll(taxiPoiMap.keySet());
+                        twitterPoiMap.keySet().removeAll(intersection);
+                        taxiPoiMap.keySet().removeAll(intersection);
+
+
+                        System.out.println(list.size());
+                        JsonElement tweets = gson.toJsonTree(list, listType);
+                        JsonElement places = gson.toJsonTree(placesMap, mapType);
+                        JsonElement days = gson.toJsonTree(daysMap, mapType);
+                        JsonElement hours = gson.toJsonTree(hoursMap, mapType);
+                        JsonElement mins = gson.toJsonTree(minsMap, mapType);
+                        JsonElement vehicles = gson.toJsonTree(vehicleTweets, listType);
+                        JsonElement twitterPois = gson.toJsonTree(twitterPoiMap.keySet(), poiType);
+                        JsonElement taxiPois = gson.toJsonTree(taxiPoiMap.keySet(), poiType);
+                        JsonElement taxiTwitterPois = gson.toJsonTree(intersection);
+
+
+                        JsonObject timePoints = new JsonObject();
+                        timePoints.add("days", days);
+                        timePoints.add("hours", hours);
+                        timePoints.add("mins", mins);
+
+                        JsonObject root = new JsonObject();
+                        root.add("tweets", tweets);
+                        root.add("places", places);
+                        root.add("timePoints", timePoints);
+                        root.add("vehiclesPOIS", vehicles);
+                        root.add("twitterPois", twitterPois);
+                        root.add("taxiPois", taxiPois);
+                        root.add("taxiTwitterPois", taxiTwitterPois);
+                        root.addProperty("taxiTotal", taxiCounter);
+                        root.addProperty("vehicleTotal", vehicleCounter);
+
+
+                        String json = root.toString();
+                        System.out.println(json);
+
+//                        ServerSingleton.server.sendToAll(root);
+                        server.sendToAll(root);
+                        lastUpdate = DateTime.now();
+
                         list.clear();
                         placesMap.clear();
                         daysMap.clear();
@@ -224,17 +208,18 @@ public class ResultBolt extends BaseBasicBolt implements OptionsHandler
     {
         super.prepare(stormConf, context);
 
-//        try
-//        {
-//            server = new WebServer(this, 8888);
-//            server.start();
-//        }
-//        catch (Exception e)
-//        {
-//            e.printStackTrace();
-//        }
+        try
+        {
+            server = new WebServer(this, 8888);
+            server.start();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
-        ServerSingleton.server.setOptionsHandler(this);
+//        ServerSingleton.server.setOptionsHandler(this);
+        server.setOptionsHandler(this);
 
         updateTimer = new Timer();
         createTask();

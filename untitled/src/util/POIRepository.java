@@ -22,47 +22,25 @@ public class POIRepository
 
     private QuadTree quadTree;
     private Envelope2D quadEnvelope;
-    private ArrayList<POI> pois = new ArrayList<>();
-    private String path;
+    private ArrayList<POI> pois;
 
-    public POIRepository(String poiPath)
+    public POIRepository(ArrayList<POI> p)
     {
-        path = poiPath;
-        readFile();
+        pois = p;
+        findEnvelope();
         createQuadTree();
     }
 
-    private void readFile()
+    private void findEnvelope()
     {
-        try (BufferedReader reader = new BufferedReader(
-//                new FileReader("/home/milos/IdeaProjects/tweet-analyzer/new-york.csv")))
-//                new FileReader("/home/milos/IdeaProjects/tweet-analyzer/ny.csv")))
-                new FileReader(path)))
-        {
-            String line;
-            quadEnvelope = new Envelope2D(Double.MAX_VALUE, Double.MAX_VALUE,
-                    Double.MIN_VALUE, Double.MIN_VALUE);
+        quadEnvelope = new Envelope2D(Double.MAX_VALUE, Double.MAX_VALUE,
+                Double.MIN_VALUE, Double.MIN_VALUE);
 
-            while ((line = reader.readLine()) != null)
-            {
-                String[] tokens = line.split("\\|");
-                double lat = Double.parseDouble(tokens[2]);
-                double lng = Double.parseDouble(tokens[3]);
-
-                adjustEnvelope(lat, lng);
-
-                pois.add(new POI(lat, lng, tokens[4]));
-            }
-
-            reader.close();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+        for (POI poi : pois)
+            adjustEnvelope(poi.getLatitude(), poi.getLongitude());
     }
 
-    private void adjustEnvelope(double lat, double lng)
+        private void adjustEnvelope(double lat, double lng)
     {
         if (lat > quadEnvelope.xmax)
             quadEnvelope.xmax = lat;
