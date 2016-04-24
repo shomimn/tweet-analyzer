@@ -24,13 +24,17 @@ public class Main
 
     public static void main(String[] args)
     {
+        AppConfig appConfig = new AppConfig();
+        appConfig.readFromFile("appconfigproducer");
+
+
         HashMap<String, BaseProducer<?>> producers = new HashMap<>();
 
         try(BufferedReader reader = new BufferedReader(new InputStreamReader(System.in)))
         {
-            VehicleProducer vehicleProducer = new VehicleProducer(1000);
+            VehicleProducer vehicleProducer = new VehicleProducer(1000, appConfig.vehiclesPath);
             vehicleProducer.run();
-            TaxiProducer taxiProducer = new TaxiProducer(500);
+            TaxiProducer taxiProducer = new TaxiProducer(500, appConfig.taxisPath);
             taxiProducer.run();
 
             producers.put(VEHICLE_KEY, vehicleProducer);

@@ -7,10 +7,13 @@ public abstract class BaseProducer<T>
     protected long sleepTime;
     protected Producer<String, T> producer;
     protected Thread thread;
+    protected boolean running;
+    protected String folderPath;
 
-    public BaseProducer(long time)
+    public BaseProducer(long time, String path)
     {
-        sleepTime = time;
+        sleepTime = time; running = true;
+        folderPath = path;
     }
 
     public long getSleepTime()
@@ -23,7 +26,12 @@ public abstract class BaseProducer<T>
         sleepTime = time;
     }
 
+    public void stop() { running = false; }
     public abstract void run();
+    public abstract String getRandomFile();
+
+
+
 
     public void close()
     {
