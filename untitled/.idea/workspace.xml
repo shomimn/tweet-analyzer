@@ -6,19 +6,7 @@
     </artifacts-to-build>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7b3b8d07-e190-473d-a37d-3bf8321d0f01" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Web app/images/taxi-marker.png" afterPath="$PROJECT_DIR$/../Web app/images/taxi-marker.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Web app/images/taxiTwitter-marker.png" afterPath="$PROJECT_DIR$/../Web app/images/taxiTwitter-marker.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Web app/images/twitter-marker.png" afterPath="$PROJECT_DIR$/../Web app/images/twitter-marker.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Web app/images/vehicle-marker.png" afterPath="$PROJECT_DIR$/../Web app/images/vehicle-marker.png" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/kafka producer/com/mnm/producer/TaxiProducer$1.class" afterPath="$PROJECT_DIR$/out/production/kafka producer/com/mnm/producer/TaxiProducer$1.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/kafka producer/com/mnm/producer/TaxiProducer.class" afterPath="$PROJECT_DIR$/out/production/kafka producer/com/mnm/producer/TaxiProducer.class" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Web app/index.html" afterPath="$PROJECT_DIR$/../Web app/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../Web app/scripts/javascript.js" afterPath="$PROJECT_DIR$/../Web app/scripts/javascript.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../kafka producer/src/com/mnm/producer/TaxiProducer.java" afterPath="$PROJECT_DIR$/../kafka producer/src/com/mnm/producer/TaxiProducer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/untitled.iml" afterPath="$PROJECT_DIR$/untitled.iml" />
-    </list>
+    <list default="true" id="7b3b8d07-e190-473d-a37d-3bf8321d0f01" name="Default" comment="" />
     <ignored path="untitled.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path="$PROJECT_DIR$/out/" />
@@ -186,8 +174,8 @@
         <option value="$PROJECT_DIR$/../kafka producer/src/com/mnm/Main.java" />
         <option value="$PROJECT_DIR$/untitled.iml" />
         <option value="$PROJECT_DIR$/../kafka producer/src/com/mnm/producer/VehicleProducer.java" />
-        <option value="$PROJECT_DIR$/../kafka producer/src/com/mnm/producer/TaxiProducer.java" />
         <option value="$PROJECT_DIR$/../kafka producer/src/com/mnm/producer/BaseProducer.java" />
+        <option value="$PROJECT_DIR$/../kafka producer/src/com/mnm/producer/TaxiProducer.java" />
       </list>
     </option>
   </component>
