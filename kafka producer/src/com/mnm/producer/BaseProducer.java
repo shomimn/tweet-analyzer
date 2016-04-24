@@ -4,23 +4,25 @@ import org.apache.kafka.clients.producer.Producer;
 
 public abstract class BaseProducer<T>
 {
-    protected long sleepTime;
+    protected long delay;
     protected Producer<String, T> producer;
     protected Thread thread;
+    protected boolean repeat;
+    protected long max;
 
     public BaseProducer(long time)
     {
-        sleepTime = time;
+        delay = time;
     }
 
-    public long getSleepTime()
+    public long getDelay()
     {
-        return sleepTime;
+        return delay;
     }
 
-    public void setSleepTime(long time)
+    public void setDelay(long time)
     {
-        sleepTime = time;
+        delay = time;
     }
 
     public abstract void run();
@@ -29,5 +31,12 @@ public abstract class BaseProducer<T>
     {
         producer.close();
         thread.interrupt();
+    }
+
+    public String getInfo()
+    {
+        return "delay: " + delay + "ms\n" +
+               "repeat: " + repeat + "\n" +
+               "max: " + max + "\n";
     }
 }

@@ -4,17 +4,13 @@ package com.mnm.producer;
 import com.mnm.data.Vehicle;
 import com.mnm.serialization.VehicleSerialization;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.common.utils.Utils;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.Properties;
-import java.util.concurrent.RunnableFuture;
 
 public class VehicleProducer extends BaseProducer<Vehicle>
 {
@@ -55,7 +51,7 @@ public class VehicleProducer extends BaseProducer<Vehicle>
                         String[] values = line.split(" ");
                         Vehicle vehicle = new Vehicle(Long.parseLong(values[0]), Long.parseLong(values[1]), Double.parseDouble(values[3]), Double.parseDouble(values[4]));
                         producer.send(new ProducerRecord<>(VEHICLE_TOPIC, Integer.toString(ind++), vehicle));
-                        Utils.sleep(sleepTime);
+                        Utils.sleep(delay);
                     }
                 }
                 catch (Exception e)

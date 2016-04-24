@@ -4,15 +4,12 @@ package com.mnm.producer;
 import com.mnm.data.Taxi;
 import com.mnm.serialization.TaxiSerializer;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.common.utils.Utils;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.IOException;
 import java.util.Properties;
 
 
@@ -64,7 +61,7 @@ public class TaxiProducer extends BaseProducer<Taxi>
                         if (taxi.pickupLatitude != 0)
                         {
                             producer.send(new ProducerRecord<String, Taxi>(TAXI_TOPIC, Integer.toString(ind++), taxi));
-                            Utils.sleep(sleepTime);
+                            Utils.sleep(delay);
                         }
                     }
 
