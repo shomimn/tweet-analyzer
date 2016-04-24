@@ -5,7 +5,11 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
+<<<<<<< HEAD
+    <orderEntry type="inheritedJdk" />
+=======
     <orderEntry type="jdk" jdkName="1.8" jdkType="JavaSDK" />
+>>>>>>> 6931b486c9b10ab9b0634a6ba7c4581e3586fe58
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="org.apache.kafka:kafka-clients:0.9.0.1" level="project" />
   </component>

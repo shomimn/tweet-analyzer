@@ -9,10 +9,14 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.kafka.common.utils.Utils;
 
 import java.io.BufferedReader;
+
 import java.io.File;
 import java.io.FileReader;
 import java.util.Properties;
 import java.util.Random;
+
+import java.io.FileReader;
+import java.util.Properties;
 
 public class VehicleProducer extends BaseProducer<Vehicle>
 {
@@ -50,18 +54,22 @@ public class VehicleProducer extends BaseProducer<Vehicle>
                 String line;
                 int ind = 0;
 
-                while(running)
+                while(repeat)
                 {
 
                     try(BufferedReader bufferedReader = new BufferedReader(new FileReader(getRandomFile())))
                     {
+
                         while ((line = bufferedReader.readLine()) != null)
                         {
                             String[] values = line.split(" ");
                             Vehicle vehicle = new Vehicle(Long.parseLong(values[0]), Long.parseLong(values[1]), Double.parseDouble(values[3]), Double.parseDouble(values[4]));
                             producer.send(new ProducerRecord<>(VEHICLE_TOPIC, Integer.toString(ind++), vehicle));
-                            Utils.sleep(sleepTime);
+                            Utils.sleep(delay);
                         }
+
+
+
                     }
                     catch (Exception e)
                     {

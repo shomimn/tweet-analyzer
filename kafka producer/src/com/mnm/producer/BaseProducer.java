@@ -4,38 +4,45 @@ import org.apache.kafka.clients.producer.Producer;
 
 public abstract class BaseProducer<T>
 {
-    protected long sleepTime;
+    protected long delay;
     protected Producer<String, T> producer;
     protected Thread thread;
-    protected boolean running;
+
     protected String folderPath;
+
+    protected boolean repeat = true;
+    protected long max;
+
 
     public BaseProducer(long time, String path)
     {
-        sleepTime = time; running = true;
         folderPath = path;
+        delay = time;
     }
 
-    public long getSleepTime()
+    public long getDelay()
     {
-        return sleepTime;
+        return delay;
     }
 
-    public void setSleepTime(long time)
+    public void setDelay(long time)
     {
-        sleepTime = time;
+        delay = time;
     }
 
-    public void stop() { running = false; }
     public abstract void run();
     public abstract String getRandomFile();
-
-
-
 
     public void close()
     {
         producer.close();
         thread.interrupt();
+    }
+
+    public String getInfo()
+    {
+        return "delay: " + delay + "ms\n" +
+               "repeat: " + repeat + "\n" +
+               "max: " + max + "\n";
     }
 }
