@@ -20,7 +20,6 @@ public class TaxiProducer extends BaseProducer<Taxi>
 {
     public static final String TAXI_TOPIC = "taxi-topic";
     String[] listOfFiles;
-
 //    public Producer<String, Taxi> producer;
 
     public TaxiProducer(long sleepTime, String path)
