@@ -1,0 +1,2 @@
+vehiclesPath = /home/milan/tweet-analyzer/kafka producer/data/vehicles
+taxisPath = /home/milan/tweet-analyzer/kafka producer/data/taxis
