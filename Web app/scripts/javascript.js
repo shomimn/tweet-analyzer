@@ -35,6 +35,8 @@ var socket = null;
 var markers = {};
 var options = {};
 var timeStamps = [];
+var gradient;
+var opacity;
 
 var dateOptions = 
 {
@@ -374,7 +376,7 @@ function toggleHeatmap()
 
  function changeGradient() 
 {
-        var gradient = [
+        gradient = [
           'rgba(0, 255, 255, 0)',
           'rgba(0, 255, 255, 1)',
           'rgba(0, 191, 255, 1)',
@@ -391,7 +393,10 @@ function toggleHeatmap()
           'rgba(255, 0, 0, 1)'
         ]
 //        heatmap.set('gradient', heatmap.get('gradient') ? null : gradient);
-        heatmapArray[currentLayer].set('gradient', heatmapArray[currentLayer].get('gradient') ? null : gradient);
+//        heatmapArray[currentLayer].set('gradient', heatmapArray[currentLayer].get('gradient') ? null : gradient);
+    
+        for(var i=0; i<heatmapArray.length; ++i)
+            heatmapArray[i].set('gradient', heatmapArray[i].get('gradient') ? null : gradient);
       }
 
 function changeRadius() 
@@ -400,13 +405,20 @@ function changeRadius()
     if(heatRadius == 40)
         heatRadius = 10;
 //    heatmap.set('radius', heatRadius);
-    heatmapArray[currentLayer].set('radius', heatRadius);
+    for(var i=0; i<heatmapArray.length; ++i)
+        heatmapArray[i].set('radius', heatRadius);
 }
 
 function changeOpacity() 
 {
 //    heatmap.set('opacity', heatmap.get('opacity') ? null : 0.2);
-    heatmapArray[currentLayer].set('opacity', heatmapArray[currentLayer].get('opacity') ? null : 0.2);
+    if(heatmapArray[currentLayer].get('opacity'))
+        opacity = null
+    else
+        opacity = 0.2
+    
+    for(var i=0; i<heatmapArray.length; ++i)
+        heatmapArray[i].set('opacity', opacity);
 }
 
 function getPoints() 
@@ -443,6 +455,14 @@ function addPointsOnMap(dataArray)
               map: null
         });
 
+//        hmap.setMap(heatmapArray[currentLayer].getMap() ? null : map);
+        if(currentLayer > 0)
+        {
+            hmap.set('gradient', heatmapArray[currentLayer].get('gradient'));
+            hmap.set('radius', heatRadius);
+            hmap.set('opacity', opacity);
+        }
+        
         heatmapArray.push(hmap);
 
         if (index == currentLayer)

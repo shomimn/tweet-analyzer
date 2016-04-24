@@ -19,7 +19,7 @@ import java.util.Properties;
 public class TaxiProducer extends BaseProducer<Taxi>
 {
     public static final String TAXI_TOPIC = "taxi-topic";
-    public static final String FILE_PATH = "/home/milos/IdeaProjects/tweet-analyzer/untitled/trip_data_1.csv";
+    public static final String FILE_PATH = "trip_data_1.csv";
 //    public Producer<String, Taxi> producer;
 
     public TaxiProducer(long sleepTime)
