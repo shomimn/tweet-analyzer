@@ -84,6 +84,7 @@ public class TaxiProducer extends BaseProducer<Taxi>
                     catch (Exception e)
                     {
                         e.printStackTrace();
+                        producer.close();
                     }
                 }
                 producer.close();

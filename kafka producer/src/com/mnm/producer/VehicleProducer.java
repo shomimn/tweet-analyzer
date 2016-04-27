@@ -76,6 +76,7 @@ public class VehicleProducer extends BaseProducer<Vehicle>
                     catch (Exception e)
                     {
                         e.printStackTrace();
+                        producer.close();
                     }
                 }
                 producer.close();
