@@ -9,50 +9,11 @@ import java.util.HashMap;
 
 public class AppConfig
 {
-    interface Converter
-    {
-        Object convert(String value);
-    }
-
-    class StringConverter implements Converter
-    {
-        public String convert(String value)
-        {
-            return value;
-        }
-    }
-
-    class IntConverter implements Converter
-    {
-        public Integer convert(String value)
-        {
-            return Integer.parseInt(value);
-        }
-    }
-
-    class DoubleConverter implements Converter
-    {
-        public Double convert(String value)
-        {
-            return Double.parseDouble(value);
-        }
-    }
-
     public String vehiclesPath;
     public String taxisPath;
 
-
-    private HashMap<String, Converter> converterMap;
-
     public AppConfig()
     {
-        converterMap = new HashMap<>();
-        StringConverter stringConverter = new StringConverter();
-
-
-        converterMap.put("vehiclesPath", stringConverter);
-        converterMap.put("taxisPath", stringConverter);
-
     }
 
     public void readFromFile(String path)
@@ -70,8 +31,7 @@ public class AppConfig
                 String value = tokens[1].trim();
 
                 Field field = AppConfig.class.getDeclaredField(name);
-//                field.set(this, value);
-                field.set(this, converterMap.get(name).convert(value));
+                field.set(this, value);
             }
         }
         catch (Exception e)

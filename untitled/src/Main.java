@@ -109,7 +109,6 @@ public class Main
 
         Config config = new Config();
 //        config.setDebug(true);
-//        config.setNumWorkers(2);
 
         LocalCluster cluster = new LocalCluster();
 

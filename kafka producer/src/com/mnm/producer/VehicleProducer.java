@@ -54,36 +54,32 @@ public class VehicleProducer extends BaseProducer<Vehicle>
                 String line;
                 int ind = 0;
 
-                while(repeat)
+                while (repeat)
                 {
-
-                    try(BufferedReader bufferedReader = new BufferedReader(new FileReader(getRandomFile())))
+                    try (BufferedReader bufferedReader = new BufferedReader(new FileReader(getRandomFile())))
                     {
-
                         while ((line = bufferedReader.readLine()) != null)
                         {
                             String[] values = line.split(" ");
                             Vehicle vehicle = new Vehicle(Long.parseLong(values[0]), Long.parseLong(values[1]), Double.parseDouble(values[3]), Double.parseDouble(values[4]));
                             producer.send(new ProducerRecord<>(VEHICLE_TOPIC, Integer.toString(ind++), vehicle));
+
+                            if (max > 0 && ind > max)
+                            {
+                                repeat = false;
+                                break;
+                            }
+
                             Utils.sleep(delay);
                         }
-
-
-
                     }
                     catch (Exception e)
                     {
                         e.printStackTrace();
                     }
-                    finally
-                    {
-                        producer.close();
-                        System.out.println("vehicle producer closed");
-                    }
-
-
                 }
-                }
+                producer.close();
+            }
 
         });
         thread.start();

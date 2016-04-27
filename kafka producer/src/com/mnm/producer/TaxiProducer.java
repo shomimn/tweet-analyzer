@@ -57,7 +57,8 @@ public class TaxiProducer extends BaseProducer<Taxi>
                     try(BufferedReader bufferedReader = new BufferedReader(new FileReader(getRandomFile())))
                     {
                         bufferedReader.readLine();
-                        while ((line = bufferedReader.readLine()) != null) {
+                        while ((line = bufferedReader.readLine()) != null)
+                        {
                             String[] values = line.split(",");
 
                             if (values.length < 13)
@@ -65,27 +66,27 @@ public class TaxiProducer extends BaseProducer<Taxi>
 
                             Taxi taxi = new Taxi(Double.parseDouble(values[11]), Double.parseDouble(values[10]), Double.parseDouble(values[13]), Double.parseDouble(values[12]));
 
-
                             //u fajlu postoje redovi gde su sve tacke 0, pa sam ih izbacio
-                            if (taxi.pickupLatitude != 0) {
+                            if (taxi.pickupLatitude != 0)
+                            {
                                 producer.send(new ProducerRecord<String, Taxi>(TAXI_TOPIC, Integer.toString(ind++), taxi));
+
+                                if (max > 0 && ind > max)
+                                {
+                                    repeat = false;
+                                    break;
+                                }
+
                                 Utils.sleep(delay);
                             }
-
                         }
-
                     }
                     catch (Exception e)
                     {
                         e.printStackTrace();
                     }
-                    finally
-                    {
-                        producer.close();
-                        System.out.println("taxi producer closed");
-                    }
                 }
-
+                producer.close();
             }
         });
         thread.start();
