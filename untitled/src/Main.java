@@ -65,7 +65,7 @@ public class Main
         ArrayList<POI> pois = new ArrayList<>();
         fillPois(appConfig.poiPath, pois);
 
-        BrokerHosts hosts = new ZkHosts("localhost:2181");
+        BrokerHosts hosts = new ZkHosts(appConfig.zkHost);
         SpoutConfig spoutConfig = new SpoutConfig(hosts, TAXI_TOPIC, "/" + TAXI_TOPIC, UUID.randomUUID().toString());
         spoutConfig.scheme = new KeyValueSchemeAsMultiScheme(new TaxiScheme());
         KafkaSpout kafkaSpout = new KafkaSpout(spoutConfig);

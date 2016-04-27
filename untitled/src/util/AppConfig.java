@@ -41,8 +41,6 @@ public class AppConfig
     public String accessToken;
     public String accessTokenSecret;
     public String poiPath;
-    public double test1;
-    public int test2;
     public String zkHost;
 
     private HashMap<String, Converter> converterMap;
@@ -51,16 +49,13 @@ public class AppConfig
     {
         converterMap = new HashMap<>();
         StringConverter stringConverter = new StringConverter();
-        IntConverter intConverter = new IntConverter();
-        DoubleConverter doubleConverter = new DoubleConverter();
 
         converterMap.put("consumerKey", stringConverter);
         converterMap.put("consumerSecret", stringConverter);
         converterMap.put("accessToken", stringConverter);
         converterMap.put("accessTokenSecret", stringConverter);
         converterMap.put("poiPath", stringConverter);
-        converterMap.put("test1", doubleConverter);
-        converterMap.put("test2", intConverter);
+        converterMap.put("zkHost", stringConverter);
     }
 
     public void readFromFile(String path)
